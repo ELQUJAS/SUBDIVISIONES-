@@ -87,11 +87,15 @@
             background-color: #0056b3;
         }
         
-        /* Nuevo estilo para reducir el padding de las celdas del popup */
+        /* Modificación: Estilo para reducir el padding de las celdas del popup */
         .leaflet-popup table td,
         .leaflet-popup table th {
-            padding: 2px 5px; /* Reduce el padding a 2px arriba/abajo y 5px izquierda/derecha */
-            vertical-align: top; /* Alinea el contenido en la parte superior */
+            padding: 1px 2px; /* Reducido a 1px arriba/abajo y 2px izquierda/derecha */
+            vertical-align: top; /* Asegura la alineación superior */
+        }
+        /* Eliminar el padding derecho del encabezado de la tabla para acercarlo al contenido */
+        .leaflet-popup table th {
+            padding-right: 0px !important; /* Fuerza la eliminación del padding derecho */
         }
         </style>
         <title></title>
@@ -243,7 +247,7 @@
         function pop_SUBDIVISIONES20232024_2(feature, layer) {
             var popupContent = '<table>\
                         <tr>\
-                            <th scope="row" style="text-transform: uppercase; font-weight: bold; padding-right: 5px;">ROL:</th>\
+                            <th scope="row" style="text-transform: uppercase; font-weight: bold;">ROL:</th>\
                             <td>' + (feature.properties['rol'] !== null ? autolinker.link(String(feature.properties['rol']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                         </tr>\
                 </table>';
