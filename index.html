@@ -20,21 +20,21 @@
             margin: 0;
         }
 
-        /* Estilos para el recuadro de información de la capa */
+        /* Estilos para el recuadro de información de la capa (MODIFICADO) */
         #info-box {
             position: absolute;
-            top: 10px;
-            left: 10px; /* Posicionamiento en la esquina superior izquierda, cerca del control de zoom */
+            top: 100px; /* Ajusta este valor para posicionarlo debajo del buscador de roles */
+            left: 10px;
             background: rgba(255, 255, 255, 0.9);
             padding: 8px 12px;
             border-radius: 5px;
             box-shadow: 0 1px 5px rgba(0,0,0,0.4);
-            z-index: 997; /* Un z-index que lo sitúe debajo de la leyenda y el buscador de coords si se solapan */
+            z-index: 997;
             font-family: sans-serif;
             font-size: 14px;
             color: #333;
-            max-width: 250px; /* Limita el ancho para que no ocupe toda la pantalla */
-            line-height: 1.4; /* Mejora la legibilidad del texto */
+            max-width: 250px;
+            line-height: 1.4;
         }
 
         /* Estilos para el recuadro de coordenadas del cursor */
@@ -45,8 +45,8 @@
             background: rgba(255, 255, 255, 0.8);
             padding: 5px;
             border-radius: 5px;
-            z-index: 1000; /* Asegura que esté sobre el mapa y otros controles */
-            font-family: sans-serif; /* Fuente legible */
+            z-index: 1000;
+            font-family: sans-serif;
             font-size: 14px;
             color: #333;
         }
@@ -75,26 +75,26 @@
         #coordinate-search-container {
             position: absolute;
             top: 10px;
-            right: 250px; /* Ajusta esta distancia para que no se superponga con la leyenda */
+            right: 250px;
             background: rgba(255, 255, 255, 0.9);
             padding: 8px;
             border-radius: 5px;
             box-shadow: 0 1px 5px rgba(0,0,0,0.4);
-            z-index: 998; /* Un z-index ligeramente menor que la leyenda */
+            z-index: 998;
             font-family: sans-serif;
             font-size: 14px;
-            display: flex; /* Para alinear el input y el botón */
-            gap: 5px; /* Espacio entre el input y el botón */
+            display: flex;
+            gap: 5px;
         }
         #coordinate-search-input {
-            width: 200px; /* Ancho del campo de entrada */
+            width: 200px;
             padding: 5px;
             border: 1px solid #ccc;
             border-radius: 3px;
         }
         #coordinate-search-button {
             padding: 5px 10px;
-            background-color: #007bff; /* Color azul para el botón */
+            background-color: #007bff;
             color: white;
             border: none;
             border-radius: 3px;
@@ -104,21 +104,19 @@
             background-color: #0056b3;
         }
         
-        /* Modificación: Estilo para reducir el padding de las celdas del popup */
+        /* Estilo para reducir el padding de las celdas del popup */
         .leaflet-popup table td,
         .leaflet-popup table th {
-            padding: 0px; /* Elimina todo el padding por defecto en las celdas */
-            vertical-align: top; /* Asegura la alineación superior */
+            padding: 0px;
+            vertical-align: top;
         }
-        /* Ajuste específico para la celda de la cabecera (ROL:) */
         .leaflet-popup table th {
-            font-size: 14px; /* O el tamaño de fuente que uses para el texto normal */
-            white-space: nowrap; /* Evita que "ROL:" se rompa en varias líneas */
+            font-size: 14px;
+            white-space: nowrap;
         }
-        /* Ajuste específico para la celda de contenido */
         .leaflet-popup table td {
-            font-size: 14px; /* Asegura el mismo tamaño de fuente */
-            padding-left: 2px !important; /* Agrega un padding mínimo a la izquierda del contenido */
+            font-size: 14px;
+            padding-left: 2px !important;
         }
         </style>
         <title></title>
@@ -127,13 +125,13 @@
         <div id="map">
         </div>
 
-        <div id="info-box">
-            Capa de subdivisiones prediales rurales en proceso de actualización.
-        </div>
-
         <div id="coordinate-search-container">
             <input type="text" id="coordinate-search-input" placeholder="Ej: -39.483529 -72.146475">
             <button id="coordinate-search-button">Buscar Coordenada</button>
+        </div>
+
+        <div id="info-box">
+            Capa de subdivisiones prediales rurales en proceso de actualización.
         </div>
 
         <div id="coordinate-display">
@@ -365,7 +363,6 @@
         map.addControl(searchControl);
 
         // Cambiar el texto del placeholder del buscador de roles
-        // La forma más robusta es obtener el input directamente y añadir un listener para borrar el marcador
         var rolSearchInput;
         setTimeout(function() {
             rolSearchInput = document.querySelector('.leaflet-control-search input');
@@ -380,7 +377,7 @@
                     }
                 });
             }
-        }, 100); // Pequeño retraso para asegurar que el input esté en el DOM
+        }, 100);
 
         if (typeof url === 'undefined') {
             document.getElementsByClassName('search-button')[0].className += ' fa fa-binoculars';
@@ -394,7 +391,7 @@
             const latLonDisplay = document.getElementById('lat-lon');
             const utmDisplay = document.getElementById('utm');
 
-            const lat = e.latlng.lat.toFixed(6); // 6 decimales para precisión Lat/Lon
+            const lat = e.latlng.lat.toFixed(6);
             const lon = e.latlng.lng.toFixed(6);
 
             latLonDisplay.textContent = `${lat}, ${lon}`;
@@ -407,9 +404,8 @@
 
 
         // --- Lógica para el buscador de coordenadas Lat/Lon ---
-        // Variable global para el marcador de búsqueda de coordenadas
         var coordinateSearchMarker; 
-        const coordinateSearchInput = document.getElementById('coordinate-search-input'); // Obtener el input
+        const coordinateSearchInput = document.getElementById('coordinate-search-input');
 
         document.getElementById('coordinate-search-button').addEventListener('click', function() {
             const input = coordinateSearchInput.value.trim();
@@ -430,10 +426,9 @@
                         .bindPopup(`Coordenada buscada:<br>${lat.toFixed(6)}, ${lon.toFixed(6)}`)
                         .openPopup();
 
-                    // Si hay un marcador del buscador de roles, eliminarlo para evitar conflicto
                     if (rolSearchMarker) {
                         map.removeLayer(rolSearchMarker);
-                        rolSearchMarker = null; // Reiniciar la variable
+                        rolSearchMarker = null;
                     }
 
                 } else {
@@ -448,7 +443,7 @@
         coordinateSearchInput.addEventListener('input', function() {
             if (this.value.trim() === '' && coordinateSearchMarker) {
                 map.removeLayer(coordinateSearchMarker);
-                coordinateSearchMarker = null; // Reiniciar la variable
+                coordinateSearchMarker = null;
             }
         });
         // --- Fin de la lógica del buscador de coordenadas ---
