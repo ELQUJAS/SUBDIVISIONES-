@@ -12,29 +12,40 @@
         <link rel="stylesheet" href="css/fontawesome-all.min.css">
         <link rel="stylesheet" href="css/leaflet-search.css">
         <link rel="stylesheet" href="css/leaflet.photon.css">
+
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+
         <style>
         html, body, #map {
             width: 100%;
             height: 100%;
             padding: 0;
             margin: 0;
+            overflow: hidden; /* Evita barras de desplazamiento innecesarias */
+            font-family: 'Roboto', sans-serif; /* Fuente principal para toda la aplicación */
+            color: #333; /* Color de texto base */
         }
 
-        /* Estilos para el recuadro de información de la capa (MODIFICADO) */
+        /* Estilos base para todos los controles del mapa */
+        .leaflet-control-container .leaflet-control {
+            background: rgba(255, 255, 255, 0.95); /* Fondo casi blanco para todos los controles */
+            padding: 10px;
+            border-radius: 8px; /* Bordes más suaves */
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); /* Sombra más pronunciada para profundidad */
+            border: none; /* Eliminar bordes por defecto */
+        }
+
+        /* Estilos específicos para el recuadro de información de la capa */
         #info-box {
             position: absolute;
-            top: 100px; /* Ajusta este valor para posicionarlo debajo del buscador de roles */
+            top: 100px; /* Mantener posición debajo del buscador de roles */
             left: 10px;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 8px 12px;
-            border-radius: 5px;
-            box-shadow: 0 1px 5px rgba(0,0,0,0.4);
             z-index: 997;
-            font-family: sans-serif;
-            font-size: 14px;
-            color: #333;
             max-width: 250px;
-            line-height: 1.4;
+            line-height: 1.5; /* Espaciado de línea mejorado para legibilidad */
+            font-size: 0.95em; /* Ligeramente más pequeño para que no compita */
+            font-weight: 400;
+            padding: 10px 15px; /* Más padding para que se vea menos apretado */
         }
 
         /* Estilos para el recuadro de coordenadas del cursor */
@@ -42,13 +53,13 @@
             position: absolute;
             bottom: 10px;
             left: 10px;
-            background: rgba(255, 255, 255, 0.8);
-            padding: 5px;
-            border-radius: 5px;
             z-index: 1000;
-            font-family: sans-serif;
-            font-size: 14px;
-            color: #333;
+            font-size: 0.9em; /* Ligeramente más pequeño */
+            font-weight: 400;
+            padding: 8px 12px; /* Más padding */
+        }
+        #coordinate-display span {
+            font-weight: 500; /* Hace los valores de las coordenadas un poco más legibles */
         }
 
         /* Estilos para la leyenda fija (control de capas) */
@@ -59,64 +70,142 @@
             z-index: 999;
             max-height: calc(100% - 20px);
             overflow-y: auto;
+            /* Estos estilos se aplicarán también por la clase general .leaflet-control */
         }
         .leaflet-control-layers-tree-contents {
-            background-color: rgba(255, 255, 255, 0.9);
-            padding: 10px;
-            border-radius: 5px;
-            box-shadow: 0 1px 5px rgba(0,0,0,0.4);
+            background-color: transparent; /* Fondo transparente ya que el .leaflet-control ya tiene fondo */
+            padding: 0; /* Eliminar padding duplicado */
+            border-radius: 0;
+            box-shadow: none;
         }
         .leaflet-control-layers-tree-header {
-             font-weight: bold;
-             margin-bottom: 5px;
+             font-weight: 500; /* Un poco más de peso para los títulos */
+             margin-bottom: 8px; /* Más espacio debajo del encabezado */
+             padding-bottom: 5px;
+             border-bottom: 1px solid #eee; /* Separador sutil */
         }
+        /* Ajuste para los elementos de capa dentro de la leyenda */
+        .leaflet-control-layers-tree label {
+            font-size: 0.95em;
+            margin-bottom: 5px;
+            padding: 2px 0;
+        }
+        .leaflet-control-layers-tree img { /* Íconos de leyenda */
+            vertical-align: middle;
+            margin-right: 5px;
+            width: 20px; /* Ajusta el tamaño de la imagen de leyenda si es necesario */
+            height: auto;
+        }
+
 
         /* Estilos para el buscador de coordenadas Lat/Lon */
         #coordinate-search-container {
             position: absolute;
             top: 10px;
-            right: 250px;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 8px;
-            border-radius: 5px;
-            box-shadow: 0 1px 5px rgba(0,0,0,0.4);
+            right: 250px; /* Mantener distancia de la leyenda */
             z-index: 998;
-            font-family: sans-serif;
-            font-size: 14px;
+            font-size: 0.95em;
+            /* Estos estilos se aplicarán también por la clase general .leaflet-control */
+            padding: 10px; /* Ajustado para consistencia */
             display: flex;
-            gap: 5px;
+            align-items: center; /* Alinea verticalmente los elementos */
+            gap: 8px; /* Más espacio entre input y botón */
         }
         #coordinate-search-input {
             width: 200px;
-            padding: 5px;
-            border: 1px solid #ccc;
-            border-radius: 3px;
+            padding: 8px 10px; /* Más padding interno */
+            border: 1px solid #ddd; /* Borde más suave */
+            border-radius: 5px; /* Bordes ligeramente redondeados */
+            font-size: 1em;
         }
         #coordinate-search-button {
-            padding: 5px 10px;
-            background-color: #007bff;
+            padding: 8px 12px;
+            background-color: #4CAF50; /* Un verde más agradable */
             color: white;
             border: none;
-            border-radius: 3px;
+            border-radius: 5px;
             cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s ease; /* Transición suave al pasar el ratón */
         }
         #coordinate-search-button:hover {
+            background-color: #45a049;
+        }
+
+        /* Modificación para el buscador de roles (Leaflet-Search) */
+        .leaflet-control-search .search-button {
+            background-color: #007bff; /* Un azul más estándar */
+            color: white;
+            border-radius: 5px;
+            padding: 8px; /* Ajusta el padding para que el icono esté centrado */
+            font-size: 1.1em; /* Un poco más grande para el icono */
+            box-shadow: none; /* Eliminar sombra duplicada */
+            transition: background-color 0.2s ease;
+        }
+        .leaflet-control-search .search-button:hover {
             background-color: #0056b3;
         }
-        
-        /* Estilo para reducir el padding de las celdas del popup */
+        .leaflet-control-search .search-input {
+            padding: 8px 10px; /* Más padding interno */
+            border: 1px solid #ddd; /* Borde más suave */
+            border-radius: 5px;
+            font-size: 1em;
+            box-shadow: none; /* Eliminar sombra duplicada */
+            background-color: #f8f8f8; /* Fondo ligeramente gris */
+        }
+        .leaflet-control-search .search-input::placeholder { /* Estilo para el placeholder */
+            color: #888;
+        }
+        .leaflet-control-search {
+            /* Se beneficiará de los estilos generales .leaflet-control */
+            /* Ajustar su posición si es necesario para alinear con el info-box */
+            top: 10px; /* Por defecto de qgis2web */
+            left: 10px;
+        }
+        .leaflet-control-search .search-top {
+            display: flex; /* Para alinear el input y el botón de búsqueda de roles */
+            align-items: center;
+            gap: 5px; /* Espacio entre el input y el botón */
+            padding: 0; /* Eliminar padding que pueda causar problemas */
+        }
+        /* Ajuste para el ícono de Font Awesome dentro del botón */
+        .leaflet-control-search .search-button.fa {
+            line-height: normal; /* Asegura que el icono se centre verticalmente */
+        }
+
+
+        /* Popups: Estilo para reducir el padding de las celdas del popup (mantener la mínima distancia) */
+        .leaflet-popup table {
+            border-collapse: collapse; /* Elimina espacio entre celdas */
+            width: auto; /* Ajusta el ancho automáticamente al contenido */
+        }
         .leaflet-popup table td,
         .leaflet-popup table th {
-            padding: 0px;
-            vertical-align: top;
+            padding: 0px; /* Elimina TODO el padding por defecto en las celdas */
+            vertical-align: top; /* Asegura la alineación superior */
         }
         .leaflet-popup table th {
-            font-size: 14px;
-            white-space: nowrap;
+            font-size: 1em; /* Ajusta según el tamaño de fuente general del popup */
+            white-space: nowrap; /* Evita que "ROL:" se rompa en varias líneas */
         }
         .leaflet-popup table td {
-            font-size: 14px;
-            padding-left: 2px !important;
+            font-size: 1em; /* Asegura el mismo tamaño de fuente */
+            padding-left: 2px !important; /* Agrega un padding mínimo a la izquierda del contenido */
+        }
+        .leaflet-popup-content-wrapper {
+            border-radius: 8px; /* Bordes redondeados para el popup */
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); /* Sombra suave */
+            padding: 10px 15px; /* Padding interno para el contenido del popup */
+            font-size: 1em;
+        }
+        .leaflet-popup-content {
+            margin: 0; /* Eliminar márgenes por defecto */
+        }
+        .leaflet-popup-close-button {
+            color: #555; /* Color del botón de cerrar popup */
+            font-size: 1.5em;
+            top: 5px;
+            right: 5px;
         }
         </style>
         <title></title>
