@@ -86,6 +86,13 @@
         #coordinate-search-button:hover {
             background-color: #0056b3;
         }
+        
+        /* Nuevo estilo para reducir el padding de las celdas del popup */
+        .leaflet-popup table td,
+        .leaflet-popup table th {
+            padding: 2px 5px; /* Reduce el padding a 2px arriba/abajo y 5px izquierda/derecha */
+            vertical-align: top; /* Alinea el contenido en la parte superior */
+        }
         </style>
         <title></title>
     </head>
@@ -231,10 +238,12 @@
         });
         layer_GoogleSatellite_1;
         map.addLayer(layer_GoogleSatellite_1);
+        
+        // --- MODIFICACIÓN AQUÍ: pop_SUBDIVISIONES20232024_2 para "ROL" en mayúsculas y negrita, y distancia mínima ---
         function pop_SUBDIVISIONES20232024_2(feature, layer) {
             var popupContent = '<table>\
                         <tr>\
-                            <th scope="row">rol</th>\
+                            <th scope="row" style="text-transform: uppercase; font-weight: bold; padding-right: 5px;">ROL:</th>\
                             <td>' + (feature.properties['rol'] !== null ? autolinker.link(String(feature.properties['rol']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                         </tr>\
                 </table>';
@@ -244,6 +253,7 @@
 			});
 			layer.bindPopup(content, { maxHeight: 400 });
         }
+        // --- FIN MODIFICACIÓN pop_SUBDIVISIONES20232024_2 ---
 
         function style_SUBDIVISIONES20232024_2_0() {
             return {
