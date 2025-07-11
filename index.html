@@ -19,12 +19,30 @@
             padding: 0;
             margin: 0;
         }
+        /* Estilos adicionales para el recuadro de coordenadas */
+        #coordinate-display {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 5px;
+            border-radius: 5px;
+            z-index: 1000; /* Asegura que esté sobre el mapa y otros controles */
+            font-family: sans-serif; /* Fuente legible */
+            font-size: 14px;
+            color: #333;
+        }
         </style>
         <title></title>
     </head>
     <body>
         <div id="map">
         </div>
+        <div id="coordinate-display">
+            Lat/Lon: <span id="lat-lon"></span><br>
+            UTM: <span id="utm"></span>
+        </div>
+
         <script src="js/qgis2web_expressions.js"></script>
         <script src="js/leaflet.js"></script>
         <script src="js/L.Control.Layers.Tree.min.js"></script>
@@ -38,7 +56,55 @@
         <script src="js/leaflet.photon.js"></script>
         <script src="js/leaflet-search.js"></script>
         <script src="data/SUBDIVISIONES20232024_2.js"></script>
+
         <script>
+        // --- Función para convertir Lat/Lon a UTM (integrada para Chile - Zona 19S asumida) ---
+        function latLonToUtm(lat, lon) {
+            const a = 6378137.0; // Radio ecuatorial mayor del WGS84
+            const f = 1 / 298.257223563; // Achatamiento del WGS84
+            const b = a * (1 - f); // Radio polar menor
+
+            const eSquared = (a * a - b * b) / (a * a);
+            const ePrimeSquared = (a * a - b * b) / (b * b);
+            const k0 = 0.9996; // Factor de escala central para UTM
+
+            const degToRad = Math.PI / 180;
+
+            let zoneNumber = Math.floor((lon + 180) / 6) + 1;
+
+            const lambda = lon * degToRad;
+            const phi = lat * degToRad;
+            const lambda0 = ((zoneNumber * 6) - 183) * degToRad; // Meridiano central de la zona
+
+            const N = a / Math.sqrt(1 - eSquared * Math.sin(phi) * Math.sin(phi));
+            const T = Math.tan(phi) * Math.tan(phi);
+            const C = ePrimeSquared * Math.cos(phi) * Math.cos(phi);
+            const A = Math.cos(phi) * (lambda - lambda0);
+
+            const M = a * ((1 - eSquared / 4 - 3 * eSquared * eSquared / 64 - 5 * eSquared * eSquared * eSquared / 256) * phi
+                - (3 * eSquared / 8 + 3 * eSquared * eSquared / 32 + 45 * eSquared * eSquared * eSquared / 1024) * Math.sin(2 * phi)
+                + (15 * eSquared * eSquared / 256 + 45 * eSquared * eSquared * eSquared / 1024) * Math.sin(4 * phi)
+                - (35 * eSquared * eSquared * eSquared / 3072) * Math.sin(6 * phi));
+
+            const UTMEasting = k0 * N * (A + (1 - T + C) * A * A * A / 6 + (5 - 18 * T + T * T + 72 * C - 58 * ePrimeSquared) * A * A * A * A * A / 120) + 500000.0;
+            let UTMNorthing = k0 * (M + N * Math.tan(phi) * (A * A / 2 + (5 - T + 9 * C + 4 * C * C) * A * A * A * A / 24 + (61 - 58 * T + T * T + 600 * C - 330 * ePrimeSquared) * A * A * A * A * A * A / 720));
+
+            // Si es hemisferio sur, restar 10,000,000 del Northing base
+            if (lat < 0) {
+                UTMNorthing += 10000000.0; // Falso Northing para el hemisferio sur
+            }
+
+            let band = 'S'; // Asumiendo hemisferio sur para el contexto de Chile
+
+            return {
+                easting: UTMEasting.toFixed(2),
+                northing: UTMNorthing.toFixed(2),
+                zone: zoneNumber,
+                band: band
+            };
+        }
+        // --- Fin de la función UTM ---
+
         var map = L.map('map', {
             zoomControl:false, maxZoom:28, minZoom:1
         }).fitBounds([[-39.55386691951091,-72.81189110791436],[-39.00755626452367,-71.42897197657351]]);
@@ -47,17 +113,17 @@
         var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
         // remove popup's row if "visible-with-data"
         function removeEmptyRowsFromPopupContent(content, feature) {
-         var tempDiv = document.createElement('div');
-         tempDiv.innerHTML = content;
-         var rows = tempDiv.querySelectorAll('tr');
-         for (var i = 0; i < rows.length; i++) {
-             var td = rows[i].querySelector('td.visible-with-data');
-             var key = td ? td.id : '';
-             if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
-                 rows[i].parentNode.removeChild(rows[i]);
-             }
-         }
-         return tempDiv.innerHTML;
+           var tempDiv = document.createElement('div');
+           tempDiv.innerHTML = content;
+           var rows = tempDiv.querySelectorAll('tr');
+           for (var i = 0; i < rows.length; i++) {
+               var td = rows[i].querySelector('td.visible-with-data');
+               var key = td ? td.id : '';
+               if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
+                   rows[i].parentNode.removeChild(rows[i]);
+               }
+           }
+           return tempDiv.innerHTML;
         }
         // add class to format popup if it contains media
 		function addClassToPopupIfMedia(content, popup) {
@@ -107,10 +173,10 @@
         map.addLayer(layer_GoogleSatellite_1);
         function pop_SUBDIVISIONES20232024_2(feature, layer) {
             var popupContent = '<table>\
-                    <tr>\
-                        <th scope="row">rol</th>\
-                        <td>' + (feature.properties['rol'] !== null ? autolinker.link(String(feature.properties['rol']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
-                    </tr>\
+                        <tr>\
+                            <th scope="row">rol</th>\
+                            <td>' + (feature.properties['rol'] !== null ? autolinker.link(String(feature.properties['rol']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                        </tr>\
                 </table>';
             var content = removeEmptyRowsFromPopupContent(popupContent, feature);
 			layer.on('popupopen', function(e) {
@@ -127,7 +193,7 @@
                 dashArray: '',
                 lineCap: 'butt',
                 lineJoin: 'miter',
-                weight: 1.0, 
+                weight: 1.0,
                 fill: true,
                 fillOpacity: 1,
                 fillColor: 'rgba(196,60,57,0.0)',
@@ -153,12 +219,6 @@
             {label: "Google Satellite", layer: layer_GoogleSatellite_1},
             {label: "OpenStreetMap", layer: layer_OpenStreetMap_0},]
         var lay = L.control.layers.tree(null, overlaysTree,{
-            //namedToggle: true,
-            //selectorBack: false,
-            //closedSymbol: '&#8862; &#x1f5c0;',
-            //openedSymbol: '&#8863; &#x1f5c1;',
-            //collapseAll: 'Collapse all',
-            //expandAll: 'Expand all',
             collapsed: true,
         });
         lay.addTo(map);
@@ -173,6 +233,23 @@
         } else {
             document.getElementsByClassName('search-button')[1].className += ' fa fa-binoculars';
         }
+
+        // --- Script para actualizar coordenadas en el movimiento del ratón ---
+        map.on('mousemove', function(e) {
+            const latLonDisplay = document.getElementById('lat-lon');
+            const utmDisplay = document.getElementById('utm');
+
+            const lat = e.latlng.lat.toFixed(6); // 6 decimales para precisión Lat/Lon
+            const lon = e.latlng.lng.toFixed(6);
+
+            latLonDisplay.textContent = `${lat}, ${lon}`;
+
+            // Convertir a UTM
+            const utmCoords = latLonToUtm(e.latlng.lat, e.latlng.lng);
+            utmDisplay.textContent = `${utmCoords.easting} E, ${utmCoords.northing} N, Zona ${utmCoords.zone}${utmCoords.band}`;
+        });
+        // --- Fin del script de coordenadas ---
+
         </script>
     </body>
 </html>
