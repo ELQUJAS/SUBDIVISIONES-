@@ -21,45 +21,53 @@
             height: 100%;
             padding: 0;
             margin: 0;
-            overflow: hidden; /* Evita barras de desplazamiento innecesarias */
-            font-family: 'Roboto', sans-serif; /* Fuente principal para toda la aplicación */
-            color: #333; /* Color de texto base */
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            color: #333; /* Color de texto base (negro) */
         }
 
         /* Estilos base para todos los controles del mapa */
         .leaflet-control-container .leaflet-control {
             background: rgba(255, 255, 255, 0.95); /* Fondo casi blanco para todos los controles */
             padding: 10px;
-            border-radius: 8px; /* Bordes más suaves */
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15); /* Sombra más pronunciada para profundidad */
-            border: none; /* Eliminar bordes por defecto */
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border: none;
         }
 
-        /* Estilos específicos para el recuadro de información de la capa (MODIFICADO TOP) */
+        /* Estilos específicos para el recuadro de información de la capa (FONDO BLANCO 50% TRANSPARENCIA, FUENTE NEGRA) */
         #info-box {
             position: absolute;
-            top: 130px; /* Ajustado para bajarlo más */
+            top: 130px;
             left: 10px;
             z-index: 997;
             max-width: 250px;
-            line-height: 1.5; /* Espaciado de línea mejorado para legibilidad */
-            font-size: 0.95em; /* Ligeramente más pequeño para que no compita */
+            line-height: 1.5;
+            font-size: 0.95em;
             font-weight: 400;
-            padding: 10px 15px; /* Más padding para que se vea menos apretado */
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.5); /* Blanco con 50% de transparencia */
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-radius: 8px;
+            color: #333; /* Fuente negra */
         }
 
-        /* Estilos para el recuadro de coordenadas del cursor */
+        /* Estilos para el recuadro de coordenadas del cursor (FONDO BLANCO 50% TRANSPARENCIA, FUENTE NEGRA) */
         #coordinate-display {
             position: absolute;
             bottom: 10px;
             left: 10px;
             z-index: 1000;
-            font-size: 0.9em; /* Ligeramente más pequeño */
+            font-size: 0.9em;
             font-weight: 400;
-            padding: 8px 12px; /* Más padding */
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.5); /* Blanco con 50% de transparencia */
+            color: #333; /* Fuente negra */
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
         #coordinate-display span {
-            font-weight: 500; /* Hace los valores de las coordenadas un poco más legibles */
+            font-weight: 500;
         }
 
         /* Estilos para la leyenda fija (control de capas) */
@@ -168,14 +176,14 @@
         }
 
 
-        /* Popups: Estilo para reducir el padding de las celdas del popup (ÚLTIMA MODIFICACIÓN AQUÍ) */
+        /* Popups: Estilo para reducir el padding de las celdas del popup */
         .leaflet-popup table {
             border-collapse: collapse;
             width: auto;
         }
         .leaflet-popup table td,
         .leaflet-popup table th {
-            padding: 0px; /* Elimina TODO el padding por defecto */
+            padding: 0px;
             vertical-align: top;
         }
         .leaflet-popup table th {
@@ -184,7 +192,7 @@
         }
         .leaflet-popup table td {
             font-size: 1em;
-            padding-left: 1px !important; /* Reducido a 1px */
+            padding-left: 1px !important;
         }
         .leaflet-popup-content-wrapper {
             border-radius: 8px;
