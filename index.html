@@ -107,12 +107,18 @@
         /* Modificación: Estilo para reducir el padding de las celdas del popup */
         .leaflet-popup table td,
         .leaflet-popup table th {
-            padding: 1px 2px; /* Reducido a 1px arriba/abajo y 2px izquierda/derecha */
+            padding: 0px; /* Elimina todo el padding por defecto en las celdas */
             vertical-align: top; /* Asegura la alineación superior */
         }
-        /* Eliminar el padding derecho del encabezado de la tabla para acercarlo al contenido */
+        /* Ajuste específico para la celda de la cabecera (ROL:) */
         .leaflet-popup table th {
-            padding-right: 0px !important; /* Fuerza la eliminación del padding derecho */
+            font-size: 14px; /* O el tamaño de fuente que uses para el texto normal */
+            white-space: nowrap; /* Evita que "ROL:" se rompa en varias líneas */
+        }
+        /* Ajuste específico para la celda de contenido */
+        .leaflet-popup table td {
+            font-size: 14px; /* Asegura el mismo tamaño de fuente */
+            padding-left: 2px !important; /* Agrega un padding mínimo a la izquierda del contenido */
         }
         </style>
         <title></title>
@@ -415,4 +421,38 @@
 
                 if (lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) {
                     const latLng = L.latLng(lat, lon);
-                    map.setView(latLng, 15
+                    map.setView(latLng, 15);
+
+                    if (coordinateSearchMarker) {
+                        map.removeLayer(coordinateSearchMarker);
+                    }
+                    coordinateSearchMarker = L.marker(latLng).addTo(map)
+                        .bindPopup(`Coordenada buscada:<br>${lat.toFixed(6)}, ${lon.toFixed(6)}`)
+                        .openPopup();
+
+                    // Si hay un marcador del buscador de roles, eliminarlo para evitar conflicto
+                    if (rolSearchMarker) {
+                        map.removeLayer(rolSearchMarker);
+                        rolSearchMarker = null; // Reiniciar la variable
+                    }
+
+                } else {
+                    alert('Coordenadas inválidas. La latitud debe estar entre -90 y 90, la longitud entre -180 y 180.');
+                }
+            } else {
+                alert('Formato de coordenadas incorrecto. Por favor, ingrese Latitud y Longitud separadas por un espacio o una coma (ej: -39.483529 -72.146475).');
+            }
+        });
+
+        // Añadir evento para borrar el marcador de coordenadas cuando el input esté vacío
+        coordinateSearchInput.addEventListener('input', function() {
+            if (this.value.trim() === '' && coordinateSearchMarker) {
+                map.removeLayer(coordinateSearchMarker);
+                coordinateSearchMarker = null; // Reiniciar la variable
+            }
+        });
+        // --- Fin de la lógica del buscador de coordenadas ---
+
+        </script>
+    </body>
+</html>
