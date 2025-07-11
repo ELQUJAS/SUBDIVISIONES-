@@ -20,6 +20,23 @@
             margin: 0;
         }
 
+        /* Estilos para el recuadro de información de la capa */
+        #info-box {
+            position: absolute;
+            top: 10px;
+            left: 10px; /* Posicionamiento en la esquina superior izquierda, cerca del control de zoom */
+            background: rgba(255, 255, 255, 0.9);
+            padding: 8px 12px;
+            border-radius: 5px;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.4);
+            z-index: 997; /* Un z-index que lo sitúe debajo de la leyenda y el buscador de coords si se solapan */
+            font-family: sans-serif;
+            font-size: 14px;
+            color: #333;
+            max-width: 250px; /* Limita el ancho para que no ocupe toda la pantalla */
+            line-height: 1.4; /* Mejora la legibilidad del texto */
+        }
+
         /* Estilos para el recuadro de coordenadas del cursor */
         #coordinate-display {
             position: absolute;
@@ -102,6 +119,10 @@
     </head>
     <body>
         <div id="map">
+        </div>
+
+        <div id="info-box">
+            Capa de subdivisiones prediales rurales en proceso de actualización.
         </div>
 
         <div id="coordinate-search-container">
@@ -243,7 +264,7 @@
         layer_GoogleSatellite_1;
         map.addLayer(layer_GoogleSatellite_1);
         
-        // --- MODIFICACIÓN AQUÍ: pop_SUBDIVISIONES20232024_2 para "ROL" en mayúsculas y negrita, y distancia mínima ---
+        // --- MODIFICACIÓN: pop_SUBDIVISIONES20232024_2 para "ROL" en mayúsculas y negrita, y distancia mínima ---
         function pop_SUBDIVISIONES20232024_2(feature, layer) {
             var popupContent = '<table>\
                         <tr>\
@@ -394,38 +415,4 @@
 
                 if (lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) {
                     const latLng = L.latLng(lat, lon);
-                    map.setView(latLng, 15);
-
-                    if (coordinateSearchMarker) {
-                        map.removeLayer(coordinateSearchMarker);
-                    }
-                    coordinateSearchMarker = L.marker(latLng).addTo(map)
-                        .bindPopup(`Coordenada buscada:<br>${lat.toFixed(6)}, ${lon.toFixed(6)}`)
-                        .openPopup();
-
-                    // Si hay un marcador del buscador de roles, eliminarlo para evitar conflicto
-                    if (rolSearchMarker) {
-                        map.removeLayer(rolSearchMarker);
-                        rolSearchMarker = null; // Reiniciar la variable
-                    }
-
-                } else {
-                    alert('Coordenadas inválidas. La latitud debe estar entre -90 y 90, la longitud entre -180 y 180.');
-                }
-            } else {
-                alert('Formato de coordenadas incorrecto. Por favor, ingrese Latitud y Longitud separadas por un espacio o una coma (ej: -39.483529 -72.146475).');
-            }
-        });
-
-        // Añadir evento para borrar el marcador de coordenadas cuando el input esté vacío
-        coordinateSearchInput.addEventListener('input', function() {
-            if (this.value.trim() === '' && coordinateSearchMarker) {
-                map.removeLayer(coordinateSearchMarker);
-                coordinateSearchMarker = null; // Reiniciar la variable
-            }
-        });
-        // --- Fin de la lógica del buscador de coordenadas ---
-
-        </script>
-    </body>
-</html>
+                    map.setView(latLng, 15
