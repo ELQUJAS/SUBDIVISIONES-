@@ -19,7 +19,8 @@
             padding: 0;
             margin: 0;
         }
-        /* Estilos adicionales para el recuadro de coordenadas */
+
+        /* Estilos para el recuadro de coordenadas del cursor */
         #coordinate-display {
             position: absolute;
             bottom: 10px;
@@ -33,30 +34,57 @@
             color: #333;
         }
 
-        /* --- Estilos para la leyenda fija --- */
+        /* Estilos para la leyenda fija (control de capas) */
         .leaflet-control-layers-tree {
-            /* Haz que el control de capas sea más ancho si lo necesitas */
             min-width: 200px;
-            /* Posición fija en la esquina superior derecha */
             top: 10px;
             right: 10px;
-            /* Asegura que no se oculte detrás de otros elementos */
             z-index: 999;
-            /* Permite desplazamiento si hay muchas capas */
-            max-height: calc(100% - 20px); /* Ajusta según sea necesario */
-            overflow-y: auto; /* Agrega scroll si el contenido es demasiado largo */
+            max-height: calc(100% - 20px);
+            overflow-y: auto;
         }
-        /* Ajusta el fondo del control de capas */
         .leaflet-control-layers-tree-contents {
-            background-color: rgba(255, 255, 255, 0.9); /* Un fondo blanco semitransparente */
+            background-color: rgba(255, 255, 255, 0.9);
             padding: 10px;
             border-radius: 5px;
             box-shadow: 0 1px 5px rgba(0,0,0,0.4);
         }
-        /* Si quieres el título de la leyenda */
         .leaflet-control-layers-tree-header {
              font-weight: bold;
              margin-bottom: 5px;
+        }
+
+        /* Estilos para el buscador de coordenadas Lat/Lon */
+        #coordinate-search-container {
+            position: absolute;
+            top: 10px;
+            right: 250px; /* Ajusta esta distancia para que no se superponga con la leyenda */
+            background: rgba(255, 255, 255, 0.9);
+            padding: 8px;
+            border-radius: 5px;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.4);
+            z-index: 998; /* Un z-index ligeramente menor que la leyenda */
+            font-family: sans-serif;
+            font-size: 14px;
+            display: flex; /* Para alinear el input y el botón */
+            gap: 5px; /* Espacio entre el input y el botón */
+        }
+        #coordinate-search-input {
+            width: 200px; /* Ancho del campo de entrada */
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+        #coordinate-search-button {
+            padding: 5px 10px;
+            background-color: #007bff; /* Color azul para el botón */
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        #coordinate-search-button:hover {
+            background-color: #0056b3;
         }
         </style>
         <title></title>
@@ -64,6 +92,12 @@
     <body>
         <div id="map">
         </div>
+
+        <div id="coordinate-search-container">
+            <input type="text" id="coordinate-search-input" placeholder="Ej: -39.483529 -72.146475">
+            <button id="coordinate-search-button">Buscar Coordenada</button>
+        </div>
+
         <div id="coordinate-display">
             Lat/Lon: <span id="lat-lon"></span><br>
             UTM: <span id="utm"></span>
@@ -241,9 +275,9 @@
         bounds_group.addLayer(layer_SUBDIVISIONES20232024_2);
         map.addLayer(layer_SUBDIVISIONES20232024_2);
 
-        // --- Modificación para la leyenda fija y organizada ---
+        // --- Configuración para la leyenda fija y organizada ---
         var overlaysTree = [
-            // El label principal para la capa de subdivisiones, incluyendo su leyenda
+            // La capa principal de subdivisiones con su leyenda
             {label: '<img src="legend/SUBDIVISIONES20232024_2.png" /> SUBDIVISIONES 2023-2024', layer: layer_SUBDIVISIONES20232024_2},
             // Agrupamos los mapas base dentro de un nodo del árbol
             {
@@ -257,15 +291,10 @@
         ];
 
         var lay = L.control.layers.tree(null, overlaysTree,{
-            // La clave para que no se colapse por defecto
-            collapsed: false, // CAMBIADO de true a false
-            // Para que no se pueda colapsar/expandir haciendo clic en el icono
-            // autoCollapse: false, // Descomentar si quieres que el icono de colapsar desaparezca
-            // namedToggle: true, // Descomentar para mostrar los nombres de los nodos como toggles
-            // position: 'topright' // Puedes especificar la posición aquí, o usar CSS global como se hizo arriba
+            collapsed: false, // La leyenda estará expandida por defecto
         });
         lay.addTo(map);
-        // --- Fin de la modificación de la leyenda ---
+        // --- Fin de la configuración de la leyenda ---
 
         setBounds();
         map.addControl(new L.Control.Search({
@@ -279,7 +308,7 @@
             document.getElementsByClassName('search-button')[1].className += ' fa fa-binoculars';
         }
 
-        // --- Script para actualizar coordenadas en el movimiento del ratón ---
+        // --- Script para actualizar coordenadas del cursor en el movimiento del ratón ---
         map.on('mousemove', function(e) {
             const latLonDisplay = document.getElementById('lat-lon');
             const utmDisplay = document.getElementById('utm');
@@ -293,7 +322,41 @@
             const utmCoords = latLonToUtm(e.latlng.lat, e.latlng.lng);
             utmDisplay.textContent = `${utmCoords.easting} E, ${utmCoords.northing} N, Zona ${utmCoords.zone}${utmCoords.band}`;
         });
-        // --- Fin del script de coordenadas ---
+        // --- Fin del script de coordenadas del cursor ---
+
+
+        // --- Lógica para el buscador de coordenadas Lat/Lon ---
+        document.getElementById('coordinate-search-button').addEventListener('click', function() {
+            const input = document.getElementById('coordinate-search-input').value.trim();
+            const parts = input.split(/[\s,]+/).map(Number); // Divide por espacios o comas y convierte a número
+
+            // Validar si tenemos dos números (latitud y longitud)
+            if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+                const lat = parts[0];
+                const lon = parts[1];
+
+                // Validar rangos básicos de latitud y longitud
+                if (lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) {
+                    const latLng = L.latLng(lat, lon);
+                    map.setView(latLng, 15); // Centra el mapa en las coordenadas con un zoom de 15
+
+                    // Opcional: añadir un marcador temporal en la coordenada buscada
+                    // Primero, eliminar cualquier marcador de búsqueda anterior
+                    if (window.coordinateSearchMarker) {
+                        map.removeLayer(window.coordinateSearchMarker);
+                    }
+                    window.coordinateSearchMarker = L.marker(latLng).addTo(map)
+                        .bindPopup(`Coordenada buscada:<br>${lat.toFixed(6)}, ${lon.toFixed(6)}`)
+                        .openPopup();
+
+                } else {
+                    alert('Coordenadas inválidas. La latitud debe estar entre -90 y 90, la longitud entre -180 y 180.');
+                }
+            } else {
+                alert('Formato de coordenadas incorrecto. Por favor, ingrese Latitud y Longitud separadas por un espacio o una coma (ej: -39.483529 -72.146475).');
+            }
+        });
+        // --- Fin de la lógica del buscador de coordenadas ---
 
         </script>
     </body>
