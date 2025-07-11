@@ -297,16 +297,56 @@
         // --- Fin de la configuración de la leyenda ---
 
         setBounds();
-        map.addControl(new L.Control.Search({
+        
+        // --- Modificación del buscador de roles ---
+        // Variable global para el marcador de búsqueda de roles
+        var rolSearchMarker;
+
+        var searchControl = new L.Control.Search({
             layer: layer_SUBDIVISIONES20232024_2,
             initial: false,
             hideMarkerOnCollapse: true,
-            propertyName: 'rol'}));
+            propertyName: 'rol',
+            // Nuevo evento para añadir el marcador personalizado al encontrar un resultado
+            moveToLocation: function(latlng, title, map) {
+                // Eliminar el marcador anterior si existe
+                if (rolSearchMarker) {
+                    map.removeLayer(rolSearchMarker);
+                }
+                // Añadir un nuevo marcador en la ubicación encontrada
+                rolSearchMarker = L.marker(latlng).addTo(map)
+                    .bindPopup(`Rol Encontrado: ${title}`)
+                    .openPopup();
+                
+                map.setView(latlng, 15); // Centrar el mapa con un zoom de 15
+            }
+        });
+        map.addControl(searchControl);
+
+        // Cambiar el texto del placeholder del buscador de roles
+        // La forma más robusta es obtener el input directamente y añadir un listener para borrar el marcador
+        var rolSearchInput;
+        setTimeout(function() {
+            rolSearchInput = document.querySelector('.leaflet-control-search input');
+            if (rolSearchInput) {
+                rolSearchInput.placeholder = 'Ingresar rol'; // Cambiar el texto del placeholder
+
+                // Añadir evento para borrar el marcador cuando el input esté vacío
+                rolSearchInput.addEventListener('input', function() {
+                    if (this.value.trim() === '' && rolSearchMarker) {
+                        map.removeLayer(rolSearchMarker);
+                        rolSearchMarker = null; // Reiniciar la variable
+                    }
+                });
+            }
+        }, 100); // Pequeño retraso para asegurar que el input esté en el DOM
+
         if (typeof url === 'undefined') {
             document.getElementsByClassName('search-button')[0].className += ' fa fa-binoculars';
         } else {
             document.getElementsByClassName('search-button')[1].className += ' fa fa-binoculars';
         }
+        // --- Fin de la modificación del buscador de roles ---
 
         // --- Script para actualizar coordenadas del cursor en el movimiento del ratón ---
         map.on('mousemove', function(e) {
@@ -326,34 +366,48 @@
 
 
         // --- Lógica para el buscador de coordenadas Lat/Lon ---
-        document.getElementById('coordinate-search-button').addEventListener('click', function() {
-            const input = document.getElementById('coordinate-search-input').value.trim();
-            const parts = input.split(/[\s,]+/).map(Number); // Divide por espacios o comas y convierte a número
+        // Variable global para el marcador de búsqueda de coordenadas
+        var coordinateSearchMarker; 
+        const coordinateSearchInput = document.getElementById('coordinate-search-input'); // Obtener el input
 
-            // Validar si tenemos dos números (latitud y longitud)
+        document.getElementById('coordinate-search-button').addEventListener('click', function() {
+            const input = coordinateSearchInput.value.trim();
+            const parts = input.split(/[\s,]+/).map(Number);
+
             if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
                 const lat = parts[0];
                 const lon = parts[1];
 
-                // Validar rangos básicos de latitud y longitud
                 if (lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) {
                     const latLng = L.latLng(lat, lon);
-                    map.setView(latLng, 15); // Centra el mapa en las coordenadas con un zoom de 15
+                    map.setView(latLng, 15);
 
-                    // Opcional: añadir un marcador temporal en la coordenada buscada
-                    // Primero, eliminar cualquier marcador de búsqueda anterior
-                    if (window.coordinateSearchMarker) {
-                        map.removeLayer(window.coordinateSearchMarker);
+                    if (coordinateSearchMarker) {
+                        map.removeLayer(coordinateSearchMarker);
                     }
-                    window.coordinateSearchMarker = L.marker(latLng).addTo(map)
+                    coordinateSearchMarker = L.marker(latLng).addTo(map)
                         .bindPopup(`Coordenada buscada:<br>${lat.toFixed(6)}, ${lon.toFixed(6)}`)
                         .openPopup();
+
+                    // Si hay un marcador del buscador de roles, eliminarlo para evitar conflicto
+                    if (rolSearchMarker) {
+                        map.removeLayer(rolSearchMarker);
+                        rolSearchMarker = null; // Reiniciar la variable
+                    }
 
                 } else {
                     alert('Coordenadas inválidas. La latitud debe estar entre -90 y 90, la longitud entre -180 y 180.');
                 }
             } else {
                 alert('Formato de coordenadas incorrecto. Por favor, ingrese Latitud y Longitud separadas por un espacio o una coma (ej: -39.483529 -72.146475).');
+            }
+        });
+
+        // Añadir evento para borrar el marcador de coordenadas cuando el input esté vacío
+        coordinateSearchInput.addEventListener('input', function() {
+            if (this.value.trim() === '' && coordinateSearchMarker) {
+                map.removeLayer(coordinateSearchMarker);
+                coordinateSearchMarker = null; // Reiniciar la variable
             }
         });
         // --- Fin de la lógica del buscador de coordenadas ---
