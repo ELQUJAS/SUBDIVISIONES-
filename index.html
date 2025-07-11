@@ -35,10 +35,10 @@
             border: none;
         }
 
-        /* Estilos específicos para el recuadro de información de la capa (FONDO BLANCO 50% TRANSPARENCIA, FUENTE NEGRA) */
+        /* Estilos específicos para el recuadro de información de la capa */
         #info-box {
             position: absolute;
-            top: 180px; /* Aumentado a 180px para bajarlo más. Puedes ajustar este valor si lo necesitas. */
+            top: 210px; /* Aumentado a 210px para bajarlo más. Puedes ajustar este valor si lo necesitas. */
             left: 10px;
             z-index: 997;
             max-width: 250px;
@@ -52,7 +52,7 @@
             color: #333; /* Fuente negra */
         }
 
-        /* Estilos para el recuadro de coordenadas del cursor (FONDO BLANCO 50% TRANSPARENCIA, FUENTE NEGRA) */
+        /* Estilos para el recuadro de coordenadas del cursor */
         #coordinate-display {
             position: absolute;
             bottom: 10px;
@@ -443,9 +443,13 @@
                 if (rolSearchMarker) {
                     map.removeLayer(rolSearchMarker);
                 }
-                // Añadir un nuevo marcador en la ubicación encontrada
+                
+                const lat = latlng.lat.toFixed(6);
+                const lon = latlng.lng.toFixed(6);
+
+                // Añadir un nuevo marcador en la ubicación encontrada con el rol y las coordenadas
                 rolSearchMarker = L.marker(latlng).addTo(map)
-                    .bindPopup(`Rol Encontrado: ${title}`)
+                    .bindPopup(`Rol Encontrado: ${title}<br>Lat/Lon: ${lat}, ${lon}`)
                     .openPopup();
                 
                 map.setView(latlng, 15); // Centrar el mapa con un zoom de 15
