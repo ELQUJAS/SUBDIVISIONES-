@@ -32,6 +32,32 @@
             font-size: 14px;
             color: #333;
         }
+
+        /* --- Estilos para la leyenda fija --- */
+        .leaflet-control-layers-tree {
+            /* Haz que el control de capas sea más ancho si lo necesitas */
+            min-width: 200px;
+            /* Posición fija en la esquina superior derecha */
+            top: 10px;
+            right: 10px;
+            /* Asegura que no se oculte detrás de otros elementos */
+            z-index: 999;
+            /* Permite desplazamiento si hay muchas capas */
+            max-height: calc(100% - 20px); /* Ajusta según sea necesario */
+            overflow-y: auto; /* Agrega scroll si el contenido es demasiado largo */
+        }
+        /* Ajusta el fondo del control de capas */
+        .leaflet-control-layers-tree-contents {
+            background-color: rgba(255, 255, 255, 0.9); /* Un fondo blanco semitransparente */
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.4);
+        }
+        /* Si quieres el título de la leyenda */
+        .leaflet-control-layers-tree-header {
+             font-weight: bold;
+             margin-bottom: 5px;
+        }
         </style>
         <title></title>
     </head>
@@ -89,9 +115,9 @@
             const UTMEasting = k0 * N * (A + (1 - T + C) * A * A * A / 6 + (5 - 18 * T + T * T + 72 * C - 58 * ePrimeSquared) * A * A * A * A * A / 120) + 500000.0;
             let UTMNorthing = k0 * (M + N * Math.tan(phi) * (A * A / 2 + (5 - T + 9 * C + 4 * C * C) * A * A * A * A / 24 + (61 - 58 * T + T * T + 600 * C - 330 * ePrimeSquared) * A * A * A * A * A * A / 720));
 
-            // Si es hemisferio sur, restar 10,000,000 del Northing base
+            // Si es hemisferio sur, sumar 10,000,000 al Northing base (Falso Northing)
             if (lat < 0) {
-                UTMNorthing += 10000000.0; // Falso Northing para el hemisferio sur
+                UTMNorthing += 10000000.0;
             }
 
             let band = 'S'; // Asumiendo hemisferio sur para el contexto de Chile
@@ -214,14 +240,33 @@
         });
         bounds_group.addLayer(layer_SUBDIVISIONES20232024_2);
         map.addLayer(layer_SUBDIVISIONES20232024_2);
+
+        // --- Modificación para la leyenda fija y organizada ---
         var overlaysTree = [
+            // El label principal para la capa de subdivisiones, incluyendo su leyenda
             {label: '<img src="legend/SUBDIVISIONES20232024_2.png" /> SUBDIVISIONES 2023-2024', layer: layer_SUBDIVISIONES20232024_2},
-            {label: "Google Satellite", layer: layer_GoogleSatellite_1},
-            {label: "OpenStreetMap", layer: layer_OpenStreetMap_0},]
+            // Agrupamos los mapas base dentro de un nodo del árbol
+            {
+                label: 'Mapas Base', // Título para el grupo de mapas base
+                selectAllCheckbox: false, // No queremos un checkbox para seleccionar todo en los mapas base
+                children: [
+                    {label: "Google Satellite", layer: layer_GoogleSatellite_1},
+                    {label: "OpenStreetMap", layer: layer_OpenStreetMap_0}
+                ]
+            }
+        ];
+
         var lay = L.control.layers.tree(null, overlaysTree,{
-            collapsed: true,
+            // La clave para que no se colapse por defecto
+            collapsed: false, // CAMBIADO de true a false
+            // Para que no se pueda colapsar/expandir haciendo clic en el icono
+            // autoCollapse: false, // Descomentar si quieres que el icono de colapsar desaparezca
+            // namedToggle: true, // Descomentar para mostrar los nombres de los nodos como toggles
+            // position: 'topright' // Puedes especificar la posición aquí, o usar CSS global como se hizo arriba
         });
         lay.addTo(map);
+        // --- Fin de la modificación de la leyenda ---
+
         setBounds();
         map.addControl(new L.Control.Search({
             layer: layer_SUBDIVISIONES20232024_2,
