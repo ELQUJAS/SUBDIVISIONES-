@@ -19,12 +19,28 @@
             padding: 0;
             margin: 0;
         }
+        /* Style for the coordinates display */
+        #coordinates-display {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-family: sans-serif;
+            font-size: 14px;
+            z-index: 1000;
+            display: none; /* Hidden by default */
+        }
         </style>
         <title></title>
     </head>
     <body>
         <div id="map">
         </div>
+        <div id="coordinates-display"></div>
+
         <script src="js/qgis2web_expressions.js"></script>
         <script src="js/leaflet.js"></script>
         <script src="js/L.Control.Layers.Tree.min.js"></script>
@@ -47,17 +63,17 @@
         var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
         // remove popup's row if "visible-with-data"
         function removeEmptyRowsFromPopupContent(content, feature) {
-         var tempDiv = document.createElement('div');
-         tempDiv.innerHTML = content;
-         var rows = tempDiv.querySelectorAll('tr');
-         for (var i = 0; i < rows.length; i++) {
-             var td = rows[i].querySelector('td.visible-with-data');
-             var key = td ? td.id : '';
-             if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
-                 rows[i].parentNode.removeChild(rows[i]);
-             }
-         }
-         return tempDiv.innerHTML;
+           var tempDiv = document.createElement('div');
+           tempDiv.innerHTML = content;
+           var rows = tempDiv.querySelectorAll('tr');
+           for (var i = 0; i < rows.length; i++) {
+               var td = rows[i].querySelector('td.visible-with-data');
+               var key = td ? td.id : '';
+               if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
+                   rows[i].parentNode.removeChild(rows[i]);
+               }
+           }
+           return tempDiv.innerHTML;
         }
         // add class to format popup if it contains media
 		function addClassToPopupIfMedia(content, popup) {
@@ -177,26 +193,86 @@
             {label: "Google Satellite", layer: layer_GoogleSatellite_1},
             {label: "OpenStreetMap", layer: layer_OpenStreetMap_0},]
         var lay = L.control.layers.tree(null, overlaysTree,{
-            //namedToggle: true,
-            //selectorBack: false,
-            //closedSymbol: '&#8862; &#x1f5c0;',
-            //openedSymbol: '&#8863; &#x1f5c1;',
-            //collapseAll: 'Collapse all',
-            //expandAll: 'Expand all',
             collapsed: true,
         });
         lay.addTo(map);
         setBounds();
-        map.addControl(new L.Control.Search({
+
+        // --- Custom Search Functionality Start ---
+        var searchMarker = null; // To store the custom marker
+        var coordinatesDisplay = document.getElementById('coordinates-display');
+
+        var searchControl = new L.Control.Search({
             layer: layer_Subdivisiones20232024_2,
             initial: false,
-            hideMarkerOnCollapse: true,
-            propertyName: 'rol'}));
+            hideMarkerOnCollapse: true, // This is important for removing the default circle marker
+            propertyName: 'rol',
+            zoom: 18, // Zoom level after a successful search
+            marker: false // Disable the default marker from leaflet-search
+        });
+
+        searchControl.on('search:locationfound', function(e) {
+            // Remove previous marker if exists
+            if (searchMarker) {
+                map.removeLayer(searchMarker);
+            }
+
+            // Get the center of the found feature (e.latlng is the center)
+            var latlng = e.latlng;
+
+            // Create a custom icon (you can customize this image and size)
+            var customIcon = L.icon({
+                iconUrl: 'https://cdn-icons-png.flaticon.com/512/684/684809.png', // Replace with your desired symbol URL
+                iconSize: [32, 32], // Size of the icon
+                iconAnchor: [16, 32], // Point of the icon which will correspond to marker's location
+                popupAnchor: [0, -32] // Point from which the popup should open relative to the iconAnchor
+            });
+
+            // Add a custom marker with the icon
+            searchMarker = L.marker(latlng, {icon: customIcon})
+                .addTo(map)
+                .bindPopup("<b>Rol encontrado:</b> " + e.text + "<br>Lat: " + latlng.lat.toFixed(6) + "<br>Long: " + latlng.lng.toFixed(6))
+                .openPopup();
+
+            // Update and show coordinates display
+            coordinatesDisplay.innerHTML = "Latitud: " + latlng.lat.toFixed(6) + ", Longitud: " + latlng.lng.toFixed(6);
+            coordinatesDisplay.style.display = 'block';
+
+            // Optional: You might want to pan to the marker if not already centered
+            map.panTo(latlng);
+        });
+
+        searchControl.on('search:collapsed', function(e) {
+            // This event fires when the search bar is collapsed or cleared
+            if (searchMarker) {
+                map.removeLayer(searchMarker);
+                searchMarker = null; // Clear the reference
+            }
+            // Hide coordinates display
+            coordinatesDisplay.style.display = 'none';
+            coordinatesDisplay.innerHTML = '';
+        });
+
+        searchControl.on('search:cancel', function(e) {
+            // This event fires when the search is explicitly canceled (e.g., by clicking 'x')
+            if (searchMarker) {
+                map.removeLayer(searchMarker);
+                searchMarker = null; // Clear the reference
+            }
+            // Hide coordinates display
+            coordinatesDisplay.style.display = 'none';
+            coordinatesDisplay.innerHTML = '';
+        });
+
+        map.addControl(searchControl);
+
         if (typeof url === 'undefined') {
             document.getElementsByClassName('search-button')[0].className += ' fa fa-binoculars';
         } else {
             document.getElementsByClassName('search-button')[1].className += ' fa fa-binoculars';
         }
+        // --- Custom Search Functionality End ---
+
         </script>
     </body>
 </html>
