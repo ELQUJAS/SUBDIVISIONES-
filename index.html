@@ -19,23 +19,21 @@
             padding: 0;
             margin: 0;
         }
-        /* --- ESTILOS MODIFICADOS PARA EL VISUALIZADOR DE COORDENADAS --- */
+        /* Estilo para la visualización de coordenadas */
         #coordinates-display {
             position: absolute;
             bottom: 10px; /* Distancia desde el borde inferior */
             left: 10px; /* Distancia desde el borde izquierdo */
-            /* Eliminamos transform: translateX(-50%); y left: 50%; para que no esté centrado */
             background-color: rgba(255, 255, 255, 0.8);
             padding: 5px 10px;
             border-radius: 5px;
             font-family: sans-serif;
             font-size: 14px;
             z-index: 1000;
-            display: block; /* Ahora lo mostramos por defecto, ya que se actualiza con el mouse */
+            display: block; /* Siempre visible para coordenadas del mouse */
         }
-        /* --- FIN DE ESTILOS MODIFICADOS --- */
 
-        /* Estilo para el ícono de búsqueda celeste */
+        /* --- Estilo para el ícono de búsqueda celeste (aunque no se usará como marcador, se mantiene por si acaso) --- */
         .celeste-marker-icon {
             font-size: 32px;
             color: #00BFFF;
@@ -43,6 +41,7 @@
             text-align: center;
             line-height: 32px;
         }
+        /* --- Fin del estilo --- */
         </style>
         <title></title>
     </head>
@@ -206,7 +205,7 @@
         setBounds();
 
         // --- Funcionalidad de Búsqueda Personalizada ---
-        var searchMarker = null; // Para almacenar el marcador personalizado
+        var searchMarker = null; // Para almacenar el marcador (ya no se usará visualmente para la búsqueda)
         var coordinatesDisplay = document.getElementById('coordinates-display'); // Elemento para mostrar coordenadas
 
         var searchControl = new L.Control.Search({
@@ -215,61 +214,61 @@
             hideMarkerOnCollapse: true,
             propertyName: 'rol',
             zoom: 18,
-            marker: false
+            marker: false // Deshabilita el marcador por defecto de leaflet-search
         });
 
+        // Evento cuando se encuentra una ubicación
         searchControl.on('search:locationfound', function(e) {
             console.log('Evento: search:locationfound - Rol encontrado:', e.text);
 
-            if (searchMarker) {
+            // --- SECCIÓN MODIFICADA: Eliminado el código para añadir el marcador celeste ---
+            // Si tenías lógica aquí para eliminar el marcador anterior, ya no es necesaria
+            // porque no añadiremos uno nuevo.
+            if (searchMarker) { // Si, por alguna razón, un marcador previo estuviera ahí (e.g., de una búsqueda anterior)
                 map.removeLayer(searchMarker);
-                console.log('Marcador anterior eliminado.');
+                searchMarker = null; // Aseguramos que la referencia esté limpia
+                console.log('Marcador anterior (si existía) eliminado.');
             }
+            // --- FIN SECCIÓN MODIFICADA ---
 
             var latlng = e.latlng;
 
-            var customIcon = L.divIcon({
-                className: 'celeste-marker-icon',
-                html: '<i class="fa fa-map-marker"></i>',
-                iconSize: [32, 32],
-                iconAnchor: [16, 32],
-                popupAnchor: [0, -32]
-            });
+            // --- Ya no se crea ni se añade el 'customIcon' aquí ---
+            // var customIcon = L.divIcon({ ... });
+            // searchMarker = L.marker(latlng, {icon: customIcon}).addTo(map)...;
 
-            searchMarker = L.marker(latlng, {icon: customIcon})
-                .addTo(map)
-                .bindPopup("<b>Rol encontrado:</b> " + e.text + "<br>Lat: " + latlng.lat.toFixed(6) + "<br>Long: " + latlng.lng.toFixed(6))
-                .openPopup();
-
-            // Al encontrar un rol, aseguramos que el display de coordenadas se muestre
+            // Actualiza y muestra la visualización de coordenadas con las del resultado de la búsqueda
+            // Esto sobrescribirá las coordenadas del mouse temporalmente.
+            coordinatesDisplay.innerHTML = "Rol: " + e.text + "<br>Lat: " + latlng.lat.toFixed(6) + ", Lon: " + latlng.lng.toFixed(6);
             coordinatesDisplay.style.display = 'block';
-            coordinatesDisplay.innerHTML = "Latitud: " + latlng.lat.toFixed(6) + ", Longitud: " + latlng.lng.toFixed(6);
 
             map.panTo(latlng);
         });
 
+        // Evento cuando la barra de búsqueda se colapsa o se limpia
         searchControl.on('search:collapsed', function(e) {
             console.log('Evento: search:collapsed - El buscador se ha colapsado o limpiado.');
-            if (searchMarker) {
+            // Ya no hay un searchMarker para eliminar aquí, pero la lógica general de colapso es útil.
+            if (searchMarker) { // Redundante, pero no causa daño. searchMarker debería ser null aquí.
                 map.removeLayer(searchMarker);
                 searchMarker = null;
-                console.log('Marcador de búsqueda eliminado por colapso.');
+                console.log('Marcador de búsqueda eliminado por colapso (si existía).');
             }
-            // Mantenemos la visualización de coordenadas del mouse
-            // coordinatesDisplay.style.display = 'none'; // YA NO OCULTAMOS AQUÍ
-            // coordinatesDisplay.innerHTML = ''; // YA NO LIMPIAMOS AQUÍ
+            // Las coordenadas del mouse siguen mostrándose automáticamente.
+            // coordinatesDisplay.style.display = 'block'; // Asegura que se mantenga visible para el mousemove
         });
 
+        // Evento cuando la búsqueda es cancelada explícitamente (ej. clic en la 'x')
         searchControl.on('search:cancel', function(e) {
             console.log('Evento: search:cancel - La búsqueda ha sido cancelada.');
-            if (searchMarker) {
+            // Igual que en collapsed, ya no hay marcador.
+            if (searchMarker) { // Redundante, pero no causa daño.
                 map.removeLayer(searchMarker);
                 searchMarker = null;
-                console.log('Marcador de búsqueda eliminado por cancelación.');
+                console.log('Marcador de búsqueda eliminado por cancelación (si existía).');
             }
-            // Mantenemos la visualización de coordenadas del mouse
-            // coordinatesDisplay.style.display = 'none'; // YA NO OCULTAMOS AQUÍ
-            // coordinatesDisplay.innerHTML = ''; // YA NO LIMPIAMOS AQUÍ
+            // Las coordenadas del mouse siguen mostrándose automáticamente.
+            // coordinatesDisplay.style.display = 'block'; // Asegura que se mantenga visible para el mousemove
         });
 
         map.addControl(searchControl);
@@ -286,23 +285,19 @@
             }
         }
 
-        // --- SOLUCIÓN ROBUSTA PARA ELIMINAR MARCADOR Y RESETEAR BUSQUEDA AL VACIAR INPUT ---
+        // --- SOLUCIÓN ROBUSTA: Asegurar que la búsqueda se resetee al vaciar el input ---
+        // Esto ahora solo asegura el reseteo del buscador y la actualización de coordenadas del mouse.
         var searchInput = document.querySelector('.leaflet-control-search .search-input'); 
 
         if (searchInput) {
             searchInput.addEventListener('input', function() {
                 if (this.value === '') {
-                    console.log('Input de búsqueda vacío detectado. Forzando reseteo de búsqueda y eliminación de marcador.');
+                    console.log('Input de búsqueda vacío detectado. Forzando reseteo de búsqueda.');
                     
-                    if (searchMarker) {
-                        map.removeLayer(searchMarker);
-                        searchMarker = null;
-                        console.log('Marcador eliminado por detección de input vacío.');
-                    }
-                    
-                    // Aseguramos que el display de coordenadas del mouse continúe visible
+                    // No hay marcador para eliminar aquí, ya que no se crea.
+                    // Aseguramos que el display de coordenadas del mouse continúe visible.
                     coordinatesDisplay.style.display = 'block'; 
-                    // No limpiamos el innerHTML aquí, se actualizará con el mousemove
+                    // El contenido se actualizará automáticamente con el mousemove.
 
                     searchControl.collapse(); 
                     console.log('Control de búsqueda colapsado para resetear la búsqueda.');
@@ -311,19 +306,19 @@
         }
         // --- FIN DE SOLUCIÓN ROBUSTA ---
 
-        // --- NUEVA FUNCIONALIDAD: VISUALIZADOR DE COORDENADAS AL MOVER EL MOUSE ---
+        // --- VISUALIZADOR DE COORDENADAS AL MOVER EL MOUSE ---
         map.on('mousemove', function(e) {
             // Actualiza el contenido del div con las coordenadas del mouse
             coordinatesDisplay.innerHTML = "Lat: " + e.latlng.lat.toFixed(6) + ", Lon: " + e.latlng.lng.toFixed(6);
-            // Asegura que el display esté visible
-            coordinatesDisplay.style.display = 'block';
+            // Asegura que el display esté visible (ya lo está por defecto en CSS)
+            // coordinatesDisplay.style.display = 'block';
         });
 
         // Opcional: Si el mouse sale del mapa, podrías ocultar las coordenadas.
         // map.on('mouseout', function() {
         //     coordinatesDisplay.style.display = 'none';
         // });
-        // --- FIN DE NUEVA FUNCIONALIDAD ---
+        // --- FIN DE VISUALIZADOR DE COORDENADAS ---
 
         </script>
     </body>
