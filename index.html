@@ -33,6 +33,16 @@
             z-index: 1000;
             display: none; /* Hidden by default */
         }
+
+        /* --- Estilo para el ícono de búsqueda celeste --- */
+        .celeste-marker-icon {
+            font-size: 32px; /* Tamaño del ícono, ajusta según necesites */
+            color: #00BFFF; /* Color celeste (Deep Sky Blue), puedes usar otros tonos como #87CEEB para Sky Blue */
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5); /* Sombra para que destaque un poco */
+            text-align: center;
+            line-height: 32px; /* Debe coincidir con el iconSize[1] si es un solo ícono */
+        }
+        /* --- Fin del estilo --- */
         </style>
         <title></title>
     </head>
@@ -57,7 +67,7 @@
         <script>
         var map = L.map('map', {
             zoomControl:false, maxZoom:28, minZoom:1
-        }).fitBounds([[-39.70723063673903,-72.95311182036367],[-38.8912908807679,-71.2605362041933]]);
+        }).fitBounds([[-39.70723063673903,-72.9531118204229],[-38.8912908807679,-71.2605362041933]]);
         var hash = new L.Hash(map);
         map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
         var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
@@ -224,18 +234,19 @@
             // Get the center of the found feature (e.latlng is the center)
             var latlng = e.latlng;
 
-            // --- SECCIÓN PARA CAMBIAR EL SÍMBOLO ---
-            var customIcon = L.icon({
-                // OPCIÓN 1: Usar una imagen de Flaticon (ejemplo de un marcador de ubicación diferente)
-                iconUrl: 'https://cdn-icons-png.flaticon.com/512/447/447031.png',
-                // OPCIÓN 2: Si tienes una imagen en tu proyecto, por ejemplo, en la carpeta 'img':
-                // iconUrl: 'img/mi_nuevo_icono.png', // Descomenta esta línea y comenta la anterior si usas una imagen local.
-
-                iconSize: [38, 38],   // Ajusta el tamaño de tu nuevo icono [ancho, alto]
-                iconAnchor: [19, 38], // Punto de anclaje: generalmente la mitad del ancho y todo el alto
-                popupAnchor: [0, -38] // Posición del popup en relación con el ancla
+            // --- INICIO: CAMBIO PARA USAR ÍCONO CELESTE DE FONT AWESOME ---
+            // Usamos L.divIcon para crear un ícono basado en HTML/CSS,
+            // lo que nos permite usar clases de Font Awesome y estilos personalizados.
+            var customIcon = L.divIcon({
+                className: 'celeste-marker-icon', // Clase CSS para el color y tamaño
+                html: '<i class="fa fa-map-marker"></i>', // Ícono de Font Awesome (un pin de mapa)
+                                                          // Puedes cambiar 'fa-map-marker' por otro ícono, ej: 'fa-location-dot'
+                iconSize: [32, 32],                       // Tamaño del contenedor del ícono
+                iconAnchor: [16, 32],                     // Ancla del ícono (centro inferior para un pin)
+                popupAnchor: [0, -32]                     // Posición del popup
             });
-            // --- FIN DE LA SECCIÓN PARA CAMBIAR EL SÍMBOLO ---
+            // --- FIN: CAMBIO PARA USAR ÍCONO CELESTE DE FONT AWESOME ---
+
 
             // Add a custom marker with the icon
             searchMarker = L.marker(latlng, {icon: customIcon})
@@ -304,7 +315,6 @@
 
         if (searchInput) {
             searchInput.addEventListener('input', function() {
-                // Log para depuración del input
                 // console.log('Evento: input - Valor actual del buscador:', this.value); 
 
                 if (this.value === '') { // Si el valor del campo está vacío
@@ -322,7 +332,6 @@
                     coordinatesDisplay.innerHTML = '';
 
                     // 3. Forzar el colapso del control de búsqueda para resetear su estado
-                    // Esto limpia el texto mostrado en el buscador y resetea su estado interno.
                     searchControl.collapse(); 
                     console.log('Control de búsqueda colapsado para resetear la búsqueda.');
                 }
