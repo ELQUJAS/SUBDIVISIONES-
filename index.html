@@ -31,15 +31,16 @@
             font-size: 14px;
             z-index: 1000;
             display: block; /* Siempre visible para coordenadas del mouse */
+            white-space: pre-wrap; /* Permite saltos de línea para mostrar Lat/Lon y UTM */
         }
 
-        /* --- Estilo para el ícono de búsqueda celeste (aunque no se usará como marcador, se mantiene por si acaso) --- */
+        /* --- Estilo para el ícono de búsqueda celeste --- */
         .celeste-marker-icon {
-            font-size: 32px;
-            color: #00BFFF;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            font-size: 32px; /* Tamaño del ícono, puedes ajustarlo */
+            color: #00BFFF; /* Color celeste (Deep Sky Blue), puedes usar otros tonos como #87CEEB para Sky Blue */
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5); /* Sombra para que destaque un poco */
             text-align: center;
-            line-height: 32px;
+            line-height: 32px; /* Debe coincidir con el iconSize[1] del L.divIcon */
         }
         /* --- Fin del estilo --- */
         </style>
@@ -205,7 +206,7 @@
         setBounds();
 
         // --- Funcionalidad de Búsqueda Personalizada ---
-        var searchMarker = null; // Para almacenar el marcador (ya no se usará visualmente para la búsqueda)
+        var searchMarker = null; // Para almacenar el marcador (ahora sí se usará de nuevo)
         var coordinatesDisplay = document.getElementById('coordinates-display'); // Elemento para mostrar coordenadas
 
         var searchControl = new L.Control.Search({
@@ -221,25 +222,34 @@
         searchControl.on('search:locationfound', function(e) {
             console.log('Evento: search:locationfound - Rol encontrado:', e.text);
 
-            // --- SECCIÓN MODIFICADA: Eliminado el código para añadir el marcador celeste ---
-            // Si tenías lógica aquí para eliminar el marcador anterior, ya no es necesaria
-            // porque no añadiremos uno nuevo.
-            if (searchMarker) { // Si, por alguna razón, un marcador previo estuviera ahí (e.g., de una búsqueda anterior)
+            // Elimina el marcador anterior si existe
+            if (searchMarker) {
                 map.removeLayer(searchMarker);
-                searchMarker = null; // Aseguramos que la referencia esté limpia
-                console.log('Marcador anterior (si existía) eliminado.');
+                console.log('Marcador anterior eliminado.');
             }
-            // --- FIN SECCIÓN MODIFICADA ---
 
             var latlng = e.latlng;
+            var utmCoords = convertLatLngToUtm(latlng.lat, latlng.lng);
 
-            // --- Ya no se crea ni se añade el 'customIcon' aquí ---
-            // var customIcon = L.divIcon({ ... });
-            // searchMarker = L.marker(latlng, {icon: customIcon}).addTo(map)...;
+            // --- SECCIÓN REACTIVADA: Crea y añade el marcador celeste ---
+            var customIcon = L.divIcon({
+                className: 'celeste-marker-icon', // Aplica la clase CSS para el color y tamaño
+                html: '<i class="fa fa-map-marker"></i>', // Ícono de Font Awesome
+                iconSize: [32, 32],
+                iconAnchor: [16, 32],
+                popupAnchor: [0, -32]
+            });
+
+            searchMarker = L.marker(latlng, {icon: customIcon})
+                .addTo(map)
+                .bindPopup("<b>Rol encontrado:</b> " + e.text + "<br>Lat: " + latlng.lat.toFixed(6) + "<br>Long: " + latlng.lng.toFixed(6) + "<br>UTM: " + utmCoords.easting.toFixed(2) + " E, " + utmCoords.northing.toFixed(2) + " N (Huso " + utmCoords.zone + utmCoords.hemisphere + ")")
+                .openPopup();
+            // --- FIN SECCIÓN REACTIVADA ---
 
             // Actualiza y muestra la visualización de coordenadas con las del resultado de la búsqueda
-            // Esto sobrescribirá las coordenadas del mouse temporalmente.
-            coordinatesDisplay.innerHTML = "Rol: " + e.text + "<br>Lat: " + latlng.lat.toFixed(6) + ", Lon: " + latlng.lng.toFixed(6);
+            coordinatesDisplay.innerHTML = "Rol: " + e.text + "<br>" +
+                                          "Lat: " + latlng.lat.toFixed(6) + ", Lon: " + latlng.lng.toFixed(6) + "<br>" +
+                                          "UTM: " + utmCoords.easting.toFixed(2) + " E, " + utmCoords.northing.toFixed(2) + " N (Huso " + utmCoords.zone + utmCoords.hemisphere + ")";
             coordinatesDisplay.style.display = 'block';
 
             map.panTo(latlng);
@@ -248,27 +258,23 @@
         // Evento cuando la barra de búsqueda se colapsa o se limpia
         searchControl.on('search:collapsed', function(e) {
             console.log('Evento: search:collapsed - El buscador se ha colapsado o limpiado.');
-            // Ya no hay un searchMarker para eliminar aquí, pero la lógica general de colapso es útil.
-            if (searchMarker) { // Redundante, pero no causa daño. searchMarker debería ser null aquí.
+            if (searchMarker) { // Si hay un marcador activo, lo elimina
                 map.removeLayer(searchMarker);
                 searchMarker = null;
-                console.log('Marcador de búsqueda eliminado por colapso (si existía).');
+                console.log('Marcador de búsqueda eliminado por colapso.');
             }
-            // Las coordenadas del mouse siguen mostrándose automáticamente.
-            // coordinatesDisplay.style.display = 'block'; // Asegura que se mantenga visible para el mousemove
+            // Las coordenadas del mouse seguirán mostrándose automáticamente.
         });
 
         // Evento cuando la búsqueda es cancelada explícitamente (ej. clic en la 'x')
         searchControl.on('search:cancel', function(e) {
             console.log('Evento: search:cancel - La búsqueda ha sido cancelada.');
-            // Igual que en collapsed, ya no hay marcador.
-            if (searchMarker) { // Redundante, pero no causa daño.
+            if (searchMarker) { // Si hay un marcador activo, lo elimina
                 map.removeLayer(searchMarker);
                 searchMarker = null;
-                console.log('Marcador de búsqueda eliminado por cancelación (si existía).');
+                console.log('Marcador de búsqueda eliminado por cancelación.');
             }
-            // Las coordenadas del mouse siguen mostrándose automáticamente.
-            // coordinatesDisplay.style.display = 'block'; // Asegura que se mantenga visible para el mousemove
+            // Las coordenadas del mouse seguirán mostrándose automáticamente.
         });
 
         map.addControl(searchControl);
@@ -285,19 +291,23 @@
             }
         }
 
-        // --- SOLUCIÓN ROBUSTA: Asegurar que la búsqueda se resetee al vaciar el input ---
-        // Esto ahora solo asegura el reseteo del buscador y la actualización de coordenadas del mouse.
+        // --- SOLUCIÓN ROBUSTA: Asegura que el marcador y la búsqueda se resetee al vaciar el input ---
         var searchInput = document.querySelector('.leaflet-control-search .search-input'); 
 
         if (searchInput) {
             searchInput.addEventListener('input', function() {
-                if (this.value === '') {
-                    console.log('Input de búsqueda vacío detectado. Forzando reseteo de búsqueda.');
+                if (this.value === '') { // Si el campo de entrada está completamente vacío
+                    console.log('Input de búsqueda vacío detectado. Forzando reseteo de búsqueda y eliminación de marcador.');
                     
-                    // No hay marcador para eliminar aquí, ya que no se crea.
+                    if (searchMarker) { // Si hay un marcador activo, lo elimina
+                        map.removeLayer(searchMarker);
+                        searchMarker = null;
+                        console.log('Marcador eliminado por detección de input vacío.');
+                    }
+                    
                     // Aseguramos que el display de coordenadas del mouse continúe visible.
                     coordinatesDisplay.style.display = 'block'; 
-                    // El contenido se actualizará automáticamente con el mousemove.
+                    // El contenido del display se actualizará automáticamente con el mousemove.
 
                     searchControl.collapse(); 
                     console.log('Control de búsqueda colapsado para resetear la búsqueda.');
@@ -306,19 +316,67 @@
         }
         // --- FIN DE SOLUCIÓN ROBUSTA ---
 
+        // --- FUNCIONES DE CONVERSIÓN LAT/LON A UTM (SIMPLIFICADA para Huso 18 Sur) ---
+        // Basado en fórmulas comunes de conversión UTM. Requiere WGS84.
+        function convertLatLngToUtm(lat, lon) {
+            const a = 6378137; // Semi-eje mayor (WGS84)
+            const f = 1 / 298.257223563; // Aplanamiento (WGS84)
+            const b = a * (1 - f); // Semi-eje menor
+            const k0 = 0.9996; // Factor de escala central
+            const e = Math.sqrt(1 - (b / a) * (b / a)); // Excentricidad
+            const e2 = e * e;
+            const e4 = e2 * e2;
+            const e6 = e4 * e2;
+
+            const degToRad = Math.PI / 180;
+
+            // Para Huso 18 Sur (Chile)
+            const zone = 18;
+            const southernHemisphere = lat < 0; // Chile está en el hemisferio sur
+            const falseNorthing = southernHemisphere ? 10000000 : 0; // 10,000,000 m para el hemisferio sur
+            const falseEasting = 500000;
+
+            const lonOrigin = (zone * 6 - 183) * degToRad; // Meridiano central del Huso 18
+
+            const latRad = lat * degToRad;
+            const lonRad = lon * degToRad;
+
+            const N = a / Math.sqrt(1 - e2 * Math.sin(latRad) * Math.sin(latRad));
+            const T = Math.tan(latRad) * Math.tan(latRad);
+            const C = e2 * Math.cos(latRad) * Math.cos(latRad) / (1 - e2);
+            const A = Math.cos(latRad) * (lonRad - lonOrigin);
+
+            const M = a * ((1 - e2 / 4 - 3 * e4 / 64 - 5 * e6 / 256) * latRad -
+                           (3 * e2 / 8 + 3 * e4 / 32 + 45 * e6 / 1024) * Math.sin(2 * latRad) +
+                           (15 * e4 / 256 + 45 * e6 / 1024) * Math.sin(4 * latRad) -
+                           (35 * e6 / 3072) * Math.sin(6 * latRad));
+
+            const utmEasting = k0 * N * (A + (1 - T + C) * Math.pow(A, 3) / 6 +
+                                        (5 - 18 * T + T * T + 72 * C - 58 * e2) * Math.pow(A, 5) / 120) + falseEasting;
+            const utmNorthing = k0 * (M + N * Math.tan(latRad) * (A * A / 2 +
+                                        (5 - T + 9 * C + 4 * C * C) * Math.pow(A, 4) / 24 +
+                                        (61 - 58 * T + T * T + 600 * C - 330 * e2) * Math.pow(A, 6) / 720)) + falseNorthing;
+
+            return {
+                easting: utmEasting,
+                northing: utmNorthing,
+                zone: zone,
+                hemisphere: southernHemisphere ? 'S' : 'N'
+            };
+        }
+        // --- FIN FUNCIONES DE CONVERSIÓN UTM ---
+
+
         // --- VISUALIZADOR DE COORDENADAS AL MOVER EL MOUSE ---
         map.on('mousemove', function(e) {
-            // Actualiza el contenido del div con las coordenadas del mouse
-            coordinatesDisplay.innerHTML = "Lat: " + e.latlng.lat.toFixed(6) + ", Lon: " + e.latlng.lng.toFixed(6);
-            // Asegura que el display esté visible (ya lo está por defecto en CSS)
-            // coordinatesDisplay.style.display = 'block';
-        });
+            var latlng = e.latlng;
+            var utmCoords = convertLatLngToUtm(latlng.lat, latlng.lng);
 
-        // Opcional: Si el mouse sale del mapa, podrías ocultar las coordenadas.
-        // map.on('mouseout', function() {
-        //     coordinatesDisplay.style.display = 'none';
-        // });
-        // --- FIN DE VISUALIZADOR DE COORDENADAS ---
+            // Actualiza el contenido del div con las coordenadas del mouse (Lat/Lon y UTM)
+            coordinatesDisplay.innerHTML = "Lat: " + latlng.lat.toFixed(6) + ", Lon: " + latlng.lng.toFixed(6) + "<br>" +
+                                          "UTM: " + utmCoords.easting.toFixed(2) + " E, " + utmCoords.northing.toFixed(2) + " N (Huso " + utmCoords.zone + utmCoords.hemisphere + ")";
+            coordinatesDisplay.style.display = 'block';
+        });
 
         </script>
     </body>
