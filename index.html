@@ -128,34 +128,35 @@
         });
         layer_GoogleSatellite_1;
         map.addLayer(layer_GoogleSatellite_1);
+        // --- SECCIÓN MODIFICADA: pop_Subdivisiones20232024_2 ---
         function pop_Subdivisiones20232024_2(feature, layer) {
             var popupContent = '<table>\
                     <tr>\
-                        <th scope="row">rol</th>\
+                        <th scope="row">rol:</th>\
                         <td>' + (feature.properties['rol'] !== null ? autolinker.link(String(feature.properties['rol']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">ZONA PRI</th>\
+                        <th scope="row">ZONA PRI:</th>\
                         <td>' + (feature.properties['ZONA PRI'] !== null ? autolinker.link(String(feature.properties['ZONA PRI']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">ZONA </th>\
+                        <th scope="row">ZONA:</th>\
                         <td>' + (feature.properties['ZONA '] !== null ? autolinker.link(String(feature.properties['ZONA ']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">ZOIT</th>\
+                        <th scope="row">ZOIT:</th>\
                         <td>' + (feature.properties['ZOIT'] !== null ? autolinker.link(String(feature.properties['ZOIT']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">ESTADO LAG</th>\
+                        <th scope="row">ESTADO LAG:</th>\
                         <td>' + (feature.properties['ESTADO LAG'] !== null ? autolinker.link(String(feature.properties['ESTADO LAG']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">COMUNIDAD </th>\
+                        <th scope="row">COMUNIDAD:</th>\
                         <td>' + (feature.properties['COMUNIDAD '] !== null ? autolinker.link(String(feature.properties['COMUNIDAD ']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">CONSTRUC.</th>\
+                        <th scope="row">CONSTRUC.:</th>\
                         <td>' + (feature.properties['CONSTRUC.'] !== null ? autolinker.link(String(feature.properties['CONSTRUC.']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                 </table>';
@@ -165,6 +166,7 @@
 			});
 			layer.bindPopup(content, { maxHeight: 400 });
         }
+        // --- FIN SECCIÓN MODIFICADA ---
 
         function style_Subdivisiones20232024_2_0() {
             return {
@@ -245,18 +247,16 @@
                 .bindPopup("<b>Rol encontrado:</b> " + e.text + "<br>Lat: " + latlng.lat.toFixed(6) + "<br>Long: " + latlng.lng.toFixed(6) + "<br>UTM: " + utmCoords.easting.toFixed(2) + " E, " + utmCoords.northing.toFixed(2) + " N (Huso " + utmCoords.zone + utmCoords.hemisphere + ")")
                 .openPopup();
 
-            // --- AÑADIDO: Evento para eliminar el marcador cuando su popup se cierra ---
+            // --- Evento para eliminar el marcador cuando su popup se cierra ---
             searchMarker.on('popupclose', function() {
                 console.log('Popup del marcador cerrado. Eliminando marcador.');
                 if (searchMarker) {
                     map.removeLayer(searchMarker);
                     searchMarker = null;
                 }
-                // Después de cerrar el popup y eliminar el marcador,
-                // aseguramos que el visualizador de coordenadas vuelva a mostrar las del mouse
-                // Esto lo maneja el 'mousemove' por sí solo, pero lo confirmamos.
+                // Al cerrar el popup, el visualizador de coordenadas volverá a las del mouse automáticamente
             });
-            // --- FIN AÑADIDO ---
+            // --- Fin del Evento para eliminar el marcador ---
 
 
             // Actualiza y muestra la visualización de coordenadas con las del resultado de la búsqueda
@@ -392,7 +392,6 @@
             var utmCoords = convertLatLngToUtm(latlng.lat, latlng.lng);
 
             // Actualiza el contenido del div con las coordenadas del mouse (Lat/Lon y UTM)
-            // Esto se mantendrá visible, y será sobrescrito temporalmente solo por una búsqueda de rol.
             coordinatesDisplay.innerHTML = "Lat: " + latlng.lat.toFixed(6) + ", Lon: " + latlng.lng.toFixed(6) + "<br>" +
                                           "UTM: " + utmCoords.easting.toFixed(2) + " E, " + utmCoords.northing.toFixed(2) + " N (Huso " + utmCoords.zone + utmCoords.hemisphere + ")";
             coordinatesDisplay.style.display = 'block'; // Asegura que esté visible
