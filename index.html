@@ -128,7 +128,7 @@
         });
         layer_GoogleSatellite_1;
         map.addLayer(layer_GoogleSatellite_1);
-        // --- SECCIÓN MODIFICADA: pop_Subdivisiones20232024_2 para "ZONA COMUNAL:" y "ZOIT: Pertenece a ZOIT" ---
+        // --- SECCIÓN MODIFICADA: pop_Subdivisiones20232024_2 para "ZONA COMUNAL:" y revertir "ZOIT" ---
         function pop_Subdivisiones20232024_2(feature, layer) {
             var popupContent = '<table>\
                     <tr>\
@@ -144,7 +144,7 @@
                         <td>' + (feature.properties['ZONA '] !== null ? autolinker.link(String(feature.properties['ZONA ']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">ZOIT: Pertenece a ZOIT</th>\
+                        <th scope="row">ZOIT:</th>\
                         <td>' + (feature.properties['ZOIT'] !== null ? autolinker.link(String(feature.properties['ZOIT']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
@@ -271,7 +271,7 @@
         // Evento cuando la barra de búsqueda se colapsa o se limpia
         searchControl.on('search:collapsed', function(e) {
             console.log('Evento: search:collapsed - El buscador se ha colapsado o limpiado.');
-            if (searchMarker) { // Si hay un marcador activo (el celeste), lo elimina
+            if (searchMarker) { // Si hay un marcador activo (celeste), lo elimina
                 map.removeLayer(searchMarker);
                 searchMarker = null;
                 console.log('Marcador de búsqueda eliminado por colapso.');
@@ -282,7 +282,7 @@
         // Evento cuando la búsqueda es cancelada explícitamente (ej. clic en la 'x')
         searchControl.on('search:cancel', function(e) {
             console.log('Evento: search:cancel - La búsqueda ha sido cancelada.');
-            if (searchMarker) { // Si hay un marcador activo (el celeste), lo elimina
+            if (searchMarker) { // Si hay un marcador activo (celeste), lo elimina
                 map.removeLayer(searchMarker);
                 searchMarker = null;
                 console.log('Marcador de búsqueda eliminado por cancelación.');
@@ -314,7 +314,7 @@
                 if (this.value === '') { // Si el campo de entrada está completamente vacío
                     console.log('Input de búsqueda vacío detectado. Forzando reseteo de búsqueda y eliminación de marcador.');
                     
-                    if (searchMarker) { // Si hay un marcador activo (el celeste), lo elimina
+                    if (searchMarker) { // Si hay un marcador activo (celeste), lo elimina
                         map.removeLayer(searchMarker);
                         searchMarker = null;
                         console.log('Marcador eliminado por detección de input vacío.');
