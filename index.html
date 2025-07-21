@@ -167,7 +167,7 @@
                 dashArray: '',
                 lineCap: 'butt',
                 lineJoin: 'miter',
-                weight: 1.0, 
+                weight: 1.0,
                 fill: true,
                 fillOpacity: 1,
                 fillColor: 'rgba(183,72,75,0.0)',
@@ -266,10 +266,21 @@
 
         map.addControl(searchControl);
 
+        // Se ajusta el selector para el icono del botón de búsqueda, ya que puede variar
+        // dependiendo de si 'url' (una variable no definida en este script pero común en qgis2web) existe.
+        // Si no tienes una variable 'url' global que pueda causar el cambio, puedes simplificarlo.
         if (typeof url === 'undefined') {
-            document.getElementsByClassName('search-button')[0].className += ' fa fa-binoculars';
+            // Esto apunta al primer elemento con la clase 'search-button'
+            var searchButton = document.querySelector('.search-button');
+            if (searchButton) {
+                searchButton.className += ' fa fa-binoculars';
+            }
         } else {
-            document.getElementsByClassName('search-button')[1].className += ' fa fa-binoculars';
+            // Si hay una 'url', podría ser el segundo botón (menos común en configuraciones simples)
+            var searchButton = document.querySelectorAll('.search-button')[1];
+            if (searchButton) {
+                searchButton.className += ' fa fa-binoculars';
+            }
         }
         // --- Custom Search Functionality End ---
 
