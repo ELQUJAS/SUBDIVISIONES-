@@ -5,7 +5,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
         <meta name="mobile-web-app-capable" content="yes">
-        <meta name="apple-mobile-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
         <link rel="stylesheet" href="css/leaflet.css">
         <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
         <link rel="stylesheet" href="css/qgis2web.css">
@@ -244,7 +244,20 @@
                 .addTo(map)
                 .bindPopup("<b>Rol encontrado:</b> " + e.text + "<br>Lat: " + latlng.lat.toFixed(6) + "<br>Long: " + latlng.lng.toFixed(6) + "<br>UTM: " + utmCoords.easting.toFixed(2) + " E, " + utmCoords.northing.toFixed(2) + " N (Huso " + utmCoords.zone + utmCoords.hemisphere + ")")
                 .openPopup();
-            // --- FIN SECCIÓN: Crea y añade el marcador celeste ---
+
+            // --- AÑADIDO: Evento para eliminar el marcador cuando su popup se cierra ---
+            searchMarker.on('popupclose', function() {
+                console.log('Popup del marcador cerrado. Eliminando marcador.');
+                if (searchMarker) {
+                    map.removeLayer(searchMarker);
+                    searchMarker = null;
+                }
+                // Después de cerrar el popup y eliminar el marcador,
+                // aseguramos que el visualizador de coordenadas vuelva a mostrar las del mouse
+                // Esto lo maneja el 'mousemove' por sí solo, pero lo confirmamos.
+            });
+            // --- FIN AÑADIDO ---
+
 
             // Actualiza y muestra la visualización de coordenadas con las del resultado de la búsqueda
             coordinatesDisplay.innerHTML = "Rol: " + e.text + "<br>" +
