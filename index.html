@@ -128,7 +128,7 @@
         });
         layer_GoogleSatellite_1;
         map.addLayer(layer_GoogleSatellite_1);
-        // --- SECCIÓN MODIFICADA: pop_Subdivisiones20232024_2 para "ZONA COMUNAL:" y revertir "ZOIT" ---
+        // --- SECCIÓN MODIFICADA: pop_Subdivisiones20232024_2 para "ESTADO LAGO:" ---
         function pop_Subdivisiones20232024_2(feature, layer) {
             var popupContent = '<table>\
                     <tr>\
@@ -148,7 +148,7 @@
                         <td>' + (feature.properties['ZOIT'] !== null ? autolinker.link(String(feature.properties['ZOIT']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">ESTADO LAG:</th>\
+                        <th scope="row">ESTADO LAGO:</th>\
                         <td>' + (feature.properties['ESTADO LAG'] !== null ? autolinker.link(String(feature.properties['ESTADO LAG']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
@@ -271,7 +271,7 @@
         // Evento cuando la barra de búsqueda se colapsa o se limpia
         searchControl.on('search:collapsed', function(e) {
             console.log('Evento: search:collapsed - El buscador se ha colapsado o limpiado.');
-            if (searchMarker) { // Si hay un marcador activo (celeste), lo elimina
+            if (searchMarker) { // Si hay un marcador activo (el celeste), lo elimina
                 map.removeLayer(searchMarker);
                 searchMarker = null;
                 console.log('Marcador de búsqueda eliminado por colapso.');
