@@ -19,30 +19,30 @@
             padding: 0;
             margin: 0;
         }
-        /* Estilo para la visualización de coordenadas */
+        /* --- ESTILOS MODIFICADOS PARA EL VISUALIZADOR DE COORDENADAS --- */
         #coordinates-display {
             position: absolute;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
+            bottom: 10px; /* Distancia desde el borde inferior */
+            left: 10px; /* Distancia desde el borde izquierdo */
+            /* Eliminamos transform: translateX(-50%); y left: 50%; para que no esté centrado */
             background-color: rgba(255, 255, 255, 0.8);
             padding: 5px 10px;
             border-radius: 5px;
             font-family: sans-serif;
             font-size: 14px;
             z-index: 1000;
-            display: none; /* Oculto por defecto */
+            display: block; /* Ahora lo mostramos por defecto, ya que se actualiza con el mouse */
         }
+        /* --- FIN DE ESTILOS MODIFICADOS --- */
 
-        /* --- Estilo para el ícono de búsqueda celeste --- */
+        /* Estilo para el ícono de búsqueda celeste */
         .celeste-marker-icon {
-            font-size: 32px; /* Tamaño del ícono, puedes ajustarlo */
-            color: #00BFFF; /* Color celeste (Deep Sky Blue), puedes usar otros tonos como #87CEEB para Sky Blue */
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5); /* Sombra para que destaque un poco */
+            font-size: 32px;
+            color: #00BFFF;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
             text-align: center;
-            line-height: 32px; /* Debe coincidir con el iconSize[1] del L.divIcon */
+            line-height: 32px;
         }
-        /* --- Fin del estilo --- */
         </style>
         <title></title>
     </head>
@@ -71,7 +71,6 @@
         var hash = new L.Hash(map);
         map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
         var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
-        // Función para eliminar filas vacías del contenido del popup
         function removeEmptyRowsFromPopupContent(content, feature) {
            var tempDiv = document.createElement('div');
            tempDiv.innerHTML = content;
@@ -85,13 +84,11 @@
            }
            return tempDiv.innerHTML;
         }
-        // Función para añadir clase al popup si contiene medios (ej. imágenes)
 		function addClassToPopupIfMedia(content, popup) {
 			var tempDiv = document.createElement('div');
 			tempDiv.innerHTML = content;
 			if (tempDiv.querySelector('td img')) {
 				popup._contentNode.classList.add('media');
-					// Retraso para forzar el redibujado
 					setTimeout(function() {
 						popup.update();
 					}, 10);
@@ -131,7 +128,6 @@
         });
         layer_GoogleSatellite_1;
         map.addLayer(layer_GoogleSatellite_1);
-        // Función para crear el contenido del popup de la capa de Subdivisiones
         function pop_Subdivisiones20232024_2(feature, layer) {
             var popupContent = '<table>\
                     <tr>\
@@ -170,7 +166,6 @@
 			layer.bindPopup(content, { maxHeight: 400 });
         }
 
-        // Estilo de la capa de Subdivisiones
         function style_Subdivisiones20232024_2_0() {
             return {
                 pane: 'pane_Subdivisiones20232024_2',
@@ -214,80 +209,71 @@
         var searchMarker = null; // Para almacenar el marcador personalizado
         var coordinatesDisplay = document.getElementById('coordinates-display'); // Elemento para mostrar coordenadas
 
-        // Configuración del control de búsqueda
         var searchControl = new L.Control.Search({
             layer: layer_Subdivisiones20232024_2,
             initial: false,
-            hideMarkerOnCollapse: true, // Importante para que el marcador por defecto no interfiera
-            propertyName: 'rol', // Propiedad del GeoJSON para buscar
-            zoom: 18, // Nivel de zoom después de una búsqueda exitosa
-            marker: false // Deshabilita el marcador por defecto de leaflet-search
+            hideMarkerOnCollapse: true,
+            propertyName: 'rol',
+            zoom: 18,
+            marker: false
         });
 
-        // Evento cuando se encuentra una ubicación
         searchControl.on('search:locationfound', function(e) {
             console.log('Evento: search:locationfound - Rol encontrado:', e.text);
 
-            // Elimina el marcador anterior si existe
             if (searchMarker) {
                 map.removeLayer(searchMarker);
                 console.log('Marcador anterior eliminado.');
             }
 
-            // Obtiene las coordenadas del centro de la característica encontrada
             var latlng = e.latlng;
 
-            // --- Creación del ícono de marcador CELESTE con Font Awesome ---
             var customIcon = L.divIcon({
-                className: 'celeste-marker-icon', // Aplica la clase CSS para el color y tamaño
-                html: '<i class="fa fa-map-marker"></i>', // Ícono de Font Awesome (puedes cambiar 'fa-map-marker' por otro)
-                iconSize: [32, 32],                       // Tamaño del contenedor del ícono
-                iconAnchor: [16, 32],                     // Ancla del ícono (centro inferior para un pin)
-                popupAnchor: [0, -32]                     // Posición del popup en relación con el ancla
+                className: 'celeste-marker-icon',
+                html: '<i class="fa fa-map-marker"></i>',
+                iconSize: [32, 32],
+                iconAnchor: [16, 32],
+                popupAnchor: [0, -32]
             });
-            // --- Fin de la creación del ícono ---
 
-            // Añade el marcador personalizado con el ícono y su popup
             searchMarker = L.marker(latlng, {icon: customIcon})
                 .addTo(map)
                 .bindPopup("<b>Rol encontrado:</b> " + e.text + "<br>Lat: " + latlng.lat.toFixed(6) + "<br>Long: " + latlng.lng.toFixed(6))
                 .openPopup();
 
-            // Actualiza y muestra la visualización de coordenadas
-            coordinatesDisplay.innerHTML = "Latitud: " + latlng.lat.toFixed(6) + ", Longitud: " + latlng.lng.toFixed(6);
+            // Al encontrar un rol, aseguramos que el display de coordenadas se muestre
             coordinatesDisplay.style.display = 'block';
+            coordinatesDisplay.innerHTML = "Latitud: " + latlng.lat.toFixed(6) + ", Longitud: " + latlng.lng.toFixed(6);
 
-            // Centra el mapa en el marcador si no está ya centrado
             map.panTo(latlng);
         });
 
-        // Evento cuando la barra de búsqueda se colapsa o se limpia
         searchControl.on('search:collapsed', function(e) {
             console.log('Evento: search:collapsed - El buscador se ha colapsado o limpiado.');
             if (searchMarker) {
                 map.removeLayer(searchMarker);
-                searchMarker = null; // Limpia la referencia
+                searchMarker = null;
                 console.log('Marcador de búsqueda eliminado por colapso.');
             }
-            coordinatesDisplay.style.display = 'none';
-            coordinatesDisplay.innerHTML = '';
+            // Mantenemos la visualización de coordenadas del mouse
+            // coordinatesDisplay.style.display = 'none'; // YA NO OCULTAMOS AQUÍ
+            // coordinatesDisplay.innerHTML = ''; // YA NO LIMPIAMOS AQUÍ
         });
 
-        // Evento cuando la búsqueda es cancelada explícitamente (ej. clic en la 'x')
         searchControl.on('search:cancel', function(e) {
             console.log('Evento: search:cancel - La búsqueda ha sido cancelada.');
             if (searchMarker) {
                 map.removeLayer(searchMarker);
-                searchMarker = null; // Limpia la referencia
+                searchMarker = null;
                 console.log('Marcador de búsqueda eliminado por cancelación.');
             }
-            coordinatesDisplay.style.display = 'none';
-            coordinatesDisplay.innerHTML = '';
+            // Mantenemos la visualización de coordenadas del mouse
+            // coordinatesDisplay.style.display = 'none'; // YA NO OCULTAMOS AQUÍ
+            // coordinatesDisplay.innerHTML = ''; // YA NO LIMPIAMOS AQUÍ
         });
 
         map.addControl(searchControl);
 
-        // Añade el icono de Font Awesome al botón de búsqueda
         if (typeof url === 'undefined') {
             var searchButton = document.querySelector('.search-button');
             if (searchButton) {
@@ -300,37 +286,44 @@
             }
         }
 
-        // --- SOLUCIÓN ROBUSTA: Asegurar que el marcador y la búsqueda se eliminen al vaciar el input ---
-        // Se escucha el evento 'input' directamente en el campo de texto del buscador.
-        // Esto captura cuando el usuario borra el texto con Backspace/Suprimir.
+        // --- SOLUCIÓN ROBUSTA PARA ELIMINAR MARCADOR Y RESETEAR BUSQUEDA AL VACIAR INPUT ---
         var searchInput = document.querySelector('.leaflet-control-search .search-input'); 
 
         if (searchInput) {
             searchInput.addEventListener('input', function() {
-                // console.log('Evento: input - Valor actual del buscador:', this.value); // Útil para depuración
-
-                if (this.value === '') { // Si el campo de entrada está completamente vacío
+                if (this.value === '') {
                     console.log('Input de búsqueda vacío detectado. Forzando reseteo de búsqueda y eliminación de marcador.');
                     
-                    // 1. Elimina el marcador personalizado del mapa
                     if (searchMarker) {
                         map.removeLayer(searchMarker);
                         searchMarker = null;
                         console.log('Marcador eliminado por detección de input vacío.');
                     }
                     
-                    // 2. Oculta la visualización de coordenadas
-                    coordinatesDisplay.style.display = 'none';
-                    coordinatesDisplay.innerHTML = '';
+                    // Aseguramos que el display de coordenadas del mouse continúe visible
+                    coordinatesDisplay.style.display = 'block'; 
+                    // No limpiamos el innerHTML aquí, se actualizará con el mousemove
 
-                    // 3. Forzar el colapso del control de búsqueda.
-                    // Esto es crucial para resetear su estado interno y limpiar el texto buscado.
                     searchControl.collapse(); 
                     console.log('Control de búsqueda colapsado para resetear la búsqueda.');
                 }
             });
         }
         // --- FIN DE SOLUCIÓN ROBUSTA ---
+
+        // --- NUEVA FUNCIONALIDAD: VISUALIZADOR DE COORDENADAS AL MOVER EL MOUSE ---
+        map.on('mousemove', function(e) {
+            // Actualiza el contenido del div con las coordenadas del mouse
+            coordinatesDisplay.innerHTML = "Lat: " + e.latlng.lat.toFixed(6) + ", Lon: " + e.latlng.lng.toFixed(6);
+            // Asegura que el display esté visible
+            coordinatesDisplay.style.display = 'block';
+        });
+
+        // Opcional: Si el mouse sale del mapa, podrías ocultar las coordenadas.
+        // map.on('mouseout', function() {
+        //     coordinatesDisplay.style.display = 'none';
+        // });
+        // --- FIN DE NUEVA FUNCIONALIDAD ---
 
         </script>
     </body>
