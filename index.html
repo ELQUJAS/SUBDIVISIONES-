@@ -128,7 +128,7 @@
         });
         layer_GoogleSatellite_1;
         map.addLayer(layer_GoogleSatellite_1);
-        // --- SECCIÓN MODIFICADA: pop_Subdivisiones20232024_2 para "ESTADO LAGO:" ---
+        // --- SECCIÓN MODIFICADA: pop_Subdivisiones20232024_2 para "CANTIDAD DE CONSTRUCCIONES:" ---
         function pop_Subdivisiones20232024_2(feature, layer) {
             var popupContent = '<table>\
                     <tr>\
@@ -156,7 +156,7 @@
                         <td>' + (feature.properties['COMUNIDAD '] !== null ? autolinker.link(String(feature.properties['COMUNIDAD ']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">CONSTRUC.:</th>\
+                        <th scope="row">CANTIDAD DE CONSTRUCCIONES:</th>\
                         <td>' + (feature.properties['CONSTRUC.'] !== null ? autolinker.link(String(feature.properties['CONSTRUC.']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                 </table>';
