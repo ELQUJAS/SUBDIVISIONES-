@@ -5,7 +5,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
         <meta name="mobile-web-app-capable" content="yes">
-        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-app-capable" content="yes">
         <link rel="stylesheet" href="css/leaflet.css">
         <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
         <link rel="stylesheet" href="css/qgis2web.css">
@@ -128,11 +128,11 @@
         });
         layer_GoogleSatellite_1;
         map.addLayer(layer_GoogleSatellite_1);
-        // --- SECCIÓN MODIFICADA: pop_Subdivisiones20232024_2 ---
+        // --- SECCIÓN MODIFICADA: pop_Subdivisiones20232024_2 para "ROL:" ---
         function pop_Subdivisiones20232024_2(feature, layer) {
             var popupContent = '<table>\
                     <tr>\
-                        <th scope="row">rol:</th>\
+                        <th scope="row">ROL:</th>\
                         <td>' + (feature.properties['rol'] !== null ? autolinker.link(String(feature.properties['rol']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
@@ -222,7 +222,7 @@
 
         // Evento cuando se encuentra una ubicación al buscar
         searchControl.on('search:locationfound', function(e) {
-            console.log('Evento: search:locationfound - Rol encontrado:', e.text);
+            console.log('Evento: search:locationfound - ROL encontrado:', e.text);
 
             // Elimina el marcador anterior si existe antes de añadir uno nuevo
             if (searchMarker) {
@@ -244,7 +244,7 @@
 
             searchMarker = L.marker(latlng, {icon: customIcon})
                 .addTo(map)
-                .bindPopup("<b>Rol encontrado:</b> " + e.text + "<br>Lat: " + latlng.lat.toFixed(6) + "<br>Long: " + latlng.lng.toFixed(6) + "<br>UTM: " + utmCoords.easting.toFixed(2) + " E, " + utmCoords.northing.toFixed(2) + " N (Huso " + utmCoords.zone + utmCoords.hemisphere + ")")
+                .bindPopup("<b>ROL encontrado:</b> " + e.text + "<br>Lat: " + latlng.lat.toFixed(6) + "<br>Long: " + latlng.lng.toFixed(6) + "<br>UTM: " + utmCoords.easting.toFixed(2) + " E, " + utmCoords.northing.toFixed(2) + " N (Huso " + utmCoords.zone + utmCoords.hemisphere + ")")
                 .openPopup();
 
             // --- Evento para eliminar el marcador cuando su popup se cierra ---
@@ -260,7 +260,7 @@
 
 
             // Actualiza y muestra la visualización de coordenadas con las del resultado de la búsqueda
-            coordinatesDisplay.innerHTML = "Rol: " + e.text + "<br>" +
+            coordinatesDisplay.innerHTML = "ROL: " + e.text + "<br>" +
                                           "Lat: " + latlng.lat.toFixed(6) + ", Lon: " + latlng.lng.toFixed(6) + "<br>" +
                                           "UTM: " + utmCoords.easting.toFixed(2) + " E, " + utmCoords.northing.toFixed(2) + " N (Huso " + utmCoords.zone + utmCoords.hemisphere + ")";
             coordinatesDisplay.style.display = 'block';
@@ -392,6 +392,7 @@
             var utmCoords = convertLatLngToUtm(latlng.lat, latlng.lng);
 
             // Actualiza el contenido del div con las coordenadas del mouse (Lat/Lon y UTM)
+            // Esto se mantendrá visible, y será sobrescrito temporalmente solo por una búsqueda de rol.
             coordinatesDisplay.innerHTML = "Lat: " + latlng.lat.toFixed(6) + ", Lon: " + latlng.lng.toFixed(6) + "<br>" +
                                           "UTM: " + utmCoords.easting.toFixed(2) + " E, " + utmCoords.northing.toFixed(2) + " N (Huso " + utmCoords.zone + utmCoords.hemisphere + ")";
             coordinatesDisplay.style.display = 'block'; // Asegura que esté visible
