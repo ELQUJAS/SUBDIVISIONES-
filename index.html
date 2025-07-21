@@ -128,7 +128,7 @@
         });
         layer_GoogleSatellite_1;
         map.addLayer(layer_GoogleSatellite_1);
-        // --- SECCIÓN MODIFICADA: pop_Subdivisiones20232024_2 para "CANTIDAD DE CONSTRUCCIONES:" ---
+        // --- SECCIÓN MODIFICADA: pop_Subdivisiones20232024_2 para "COMUNIDAD INDÍGENA:" ---
         function pop_Subdivisiones20232024_2(feature, layer) {
             var popupContent = '<table>\
                     <tr>\
@@ -152,7 +152,7 @@
                         <td>' + (feature.properties['ESTADO LAG'] !== null ? autolinker.link(String(feature.properties['ESTADO LAG']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">COMUNIDAD:</th>\
+                        <th scope="row">COMUNIDAD INDÍGENA:</th>\
                         <td>' + (feature.properties['COMUNIDAD '] !== null ? autolinker.link(String(feature.properties['COMUNIDAD ']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
@@ -271,7 +271,7 @@
         // Evento cuando la barra de búsqueda se colapsa o se limpia
         searchControl.on('search:collapsed', function(e) {
             console.log('Evento: search:collapsed - El buscador se ha colapsado o limpiado.');
-            if (searchMarker) { // Si hay un marcador activo (el celeste), lo elimina
+            if (searchMarker) { // Si hay un marcador activo (celeste), lo elimina
                 map.removeLayer(searchMarker);
                 searchMarker = null;
                 console.log('Marcador de búsqueda eliminado por colapso.');
