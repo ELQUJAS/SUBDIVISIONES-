@@ -212,21 +212,22 @@
         });
 
         searchControl.on('search:locationfound', function(e) {
+            // Log para depuración
+            console.log('Evento: search:locationfound - Rol encontrado:', e.text);
+
             // Remove previous marker if exists
             if (searchMarker) {
                 map.removeLayer(searchMarker);
+                console.log('Marcador anterior eliminado.');
             }
 
             // Get the center of the found feature (e.latlng is the center)
             var latlng = e.latlng;
 
-            // --- INICIO DE LA SECCIÓN A MODIFICAR PARA CAMBIAR EL SÍMBOLO ---
-            // Aquí puedes cambiar la URL de la imagen para usar un símbolo diferente.
-            // Puedes usar una URL de una imagen en línea o una ruta a una imagen local.
-
+            // --- SECCIÓN PARA CAMBIAR EL SÍMBOLO ---
             var customIcon = L.icon({
                 // OPCIÓN 1: Usar una imagen de Flaticon (ejemplo de un marcador de ubicación diferente)
-                iconUrl: 'https://cdn-icons-png.flaticon.com/512/447/447031.png', 
+                iconUrl: 'https://cdn-icons-png.flaticon.com/512/447/447031.png',
                 // OPCIÓN 2: Si tienes una imagen en tu proyecto, por ejemplo, en la carpeta 'img':
                 // iconUrl: 'img/mi_nuevo_icono.png', // Descomenta esta línea y comenta la anterior si usas una imagen local.
 
@@ -234,7 +235,7 @@
                 iconAnchor: [19, 38], // Punto de anclaje: generalmente la mitad del ancho y todo el alto
                 popupAnchor: [0, -38] // Posición del popup en relación con el ancla
             });
-            // --- FIN DE LA SECCIÓN A MODIFICAR ---
+            // --- FIN DE LA SECCIÓN PARA CAMBIAR EL SÍMBOLO ---
 
             // Add a custom marker with the icon
             searchMarker = L.marker(latlng, {icon: customIcon})
@@ -251,10 +252,14 @@
         });
 
         searchControl.on('search:collapsed', function(e) {
+            // Log para depuración
+            console.log('Evento: search:collapsed - El buscador se ha colapsado o limpiado.');
+
             // This event fires when the search bar is collapsed or cleared
             if (searchMarker) {
                 map.removeLayer(searchMarker);
                 searchMarker = null; // Clear the reference
+                console.log('Marcador de búsqueda eliminado por colapso.');
             }
             // Hide coordinates display
             coordinatesDisplay.style.display = 'none';
@@ -262,10 +267,14 @@
         });
 
         searchControl.on('search:cancel', function(e) {
+            // Log para depuración
+            console.log('Evento: search:cancel - La búsqueda ha sido cancelada.');
+
             // This event fires when the search is explicitly canceled (e.g., by clicking 'x')
             if (searchMarker) {
                 map.removeLayer(searchMarker);
                 searchMarker = null; // Clear the reference
+                console.log('Marcador de búsqueda eliminado por cancelación.');
             }
             // Hide coordinates display
             coordinatesDisplay.style.display = 'none';
@@ -287,7 +296,29 @@
                 searchButton.className += ' fa fa-binoculars';
             }
         }
-        // --- Custom Search Functionality End ---
+
+        // --- SOLUCIÓN ALTERNATIVA: Asegurar que el marcador desaparece al vaciar el input directamente ---
+        // Esto es un respaldo si los eventos 'search:collapsed' o 'search:cancel' no siempre se disparan.
+        // Se busca el campo de entrada real dentro del control de búsqueda.
+        // La clase puede variar, pero 'search-input' es común para leaflet-search.
+        var searchInput = document.querySelector('.leaflet-control-search .search-input'); // Selector más específico
+
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                // console.log('Evento: input - Valor actual:', this.value); // Log para depuración del input
+                if (this.value === '') { // Si el valor del campo está vacío
+                    console.log('Input de búsqueda vacío. Forzando eliminación del marcador.');
+                    if (searchMarker) {
+                        map.removeLayer(searchMarker);
+                        searchMarker = null;
+                        console.log('Marcador eliminado por detección de input vacío.');
+                    }
+                    coordinatesDisplay.style.display = 'none';
+                    coordinatesDisplay.innerHTML = '';
+                }
+            });
+        }
+        // --- FIN DE SOLUCIÓN ALTERNATIVA ---
 
         </script>
     </body>
