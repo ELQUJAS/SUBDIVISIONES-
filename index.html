@@ -297,28 +297,38 @@
             }
         }
 
-        // --- SOLUCIÓN ALTERNATIVA: Asegurar que el marcador desaparece al vaciar el input directamente ---
-        // Esto es un respaldo si los eventos 'search:collapsed' o 'search:cancel' no siempre se disparan.
+        // --- SOLUCIÓN MEJORADA: Asegurar que el marcador y la búsqueda se eliminen al vaciar el input directamente ---
         // Se busca el campo de entrada real dentro del control de búsqueda.
-        // La clase puede variar, pero 'search-input' es común para leaflet-search.
-        var searchInput = document.querySelector('.leaflet-control-search .search-input'); // Selector más específico
+        // El selector '.leaflet-control-search .search-input' es más específico y robusto.
+        var searchInput = document.querySelector('.leaflet-control-search .search-input'); 
 
         if (searchInput) {
             searchInput.addEventListener('input', function() {
-                // console.log('Evento: input - Valor actual:', this.value); // Log para depuración del input
+                // Log para depuración del input
+                // console.log('Evento: input - Valor actual del buscador:', this.value); 
+
                 if (this.value === '') { // Si el valor del campo está vacío
-                    console.log('Input de búsqueda vacío. Forzando eliminación del marcador.');
+                    console.log('Input de búsqueda vacío detectado. Forzando reseteo de búsqueda y eliminación de marcador.');
+                    
+                    // 1. Eliminar el marcador personalizado
                     if (searchMarker) {
                         map.removeLayer(searchMarker);
                         searchMarker = null;
                         console.log('Marcador eliminado por detección de input vacío.');
                     }
+                    
+                    // 2. Ocultar la visualización de coordenadas
                     coordinatesDisplay.style.display = 'none';
                     coordinatesDisplay.innerHTML = '';
+
+                    // 3. Forzar el colapso del control de búsqueda para resetear su estado
+                    // Esto limpia el texto mostrado en el buscador y resetea su estado interno.
+                    searchControl.collapse(); 
+                    console.log('Control de búsqueda colapsado para resetear la búsqueda.');
                 }
             });
         }
-        // --- FIN DE SOLUCIÓN ALTERNATIVA ---
+        // --- FIN DE SOLUCIÓN MEJORADA ---
 
         </script>
     </body>
