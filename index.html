@@ -1,4 +1,4 @@
-<!doctype html>
+<!<!doctype html>
 <html lang="en">
     <head>
         <meta charset="utf-8">
@@ -132,31 +132,31 @@
             var popupContent = '<table>\
                     <tr>\
                         <th scope="row">ROL:</th>\
-                        <td>' + (feature.properties['rol'] !== null ? autolinker.link(String(feature.properties['rol']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                        <td>' + (feature.properties['rol'] !== null ? autolinker.link(String(feature.properties['rol']).trim().replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
                         <th scope="row">ZONA PRI:</th>\
-                        <td>' + (feature.properties['ZONA PRI'] !== null ? autolinker.link(String(feature.properties['ZONA PRI']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                        <td>' + (feature.properties['ZONA PRI'] !== null ? autolinker.link(String(feature.properties['ZONA PRI']).trim().replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
                         <th scope="row">ZONA COMUNAL:</th>\
-                        <td>' + (feature.properties['ZONA '] !== null ? autolinker.link(String(feature.properties['ZONA ']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                        <td>' + (feature.properties['ZONA '] !== null ? autolinker.link(String(feature.properties['ZONA ']).trim().replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
                         <th scope="row">ZOIT:</th>\
-                        <td>' + (feature.properties['ZOIT'] !== null ? autolinker.link(String(feature.properties['ZOIT']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                        <td>' + (feature.properties['ZOIT'] !== null ? autolinker.link(String(feature.properties['ZOIT']).trim().replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
                         <th scope="row">ESTADO LAGO:</th>\
-                        <td>' + (feature.properties['ESTADO LAG'] !== null ? autolinker.link(String(feature.properties['ESTADO LAG']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                        <td>' + (feature.properties['ESTADO LAG'] !== null ? autolinker.link(String(feature.properties['ESTADO LAG']).trim().replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
                         <th scope="row">COMUNIDAD INDÍGENA:</th>\
-                        <td>' + (feature.properties['COMUNIDAD '] !== null ? autolinker.link(String(feature.properties['COMUNIDAD ']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                        <td>' + (feature.properties['COMUNIDAD '] !== null ? autolinker.link(String(feature.properties['COMUNIDAD ']).trim().replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
                         <th scope="row">CANTIDAD DE CONSTRUCCIONES:</th>\
-                        <td>' + (feature.properties['CONSTRUC.'] !== null ? autolinker.link(String(feature.properties['CONSTRUC.']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                        <td>' + (feature.properties['CONSTRUC.'] !== null ? autolinker.link(String(feature.properties['CONSTRUC.']).trim().replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                 </table>';
             var content = removeEmptyRowsFromPopupContent(popupContent, feature);
@@ -259,8 +259,8 @@
 
             // Actualiza y muestra la visualización de coordenadas con las del resultado de la búsqueda
             coordinatesDisplay.innerHTML = "ROL: " + e.text + "<br>" +
-                                          "Lat: " + latlng.lat.toFixed(6) + ", Lon: " + latlng.lng.toFixed(6) + "<br>" +
-                                          "UTM: " + utmCoords.easting.toFixed(2) + " E, " + utmCoords.northing.toFixed(2) + " N (Huso " + utmCoords.zone + utmCoords.hemisphere + ")";
+                                         "Lat: " + latlng.lat.toFixed(6) + ", Lon: " + latlng.lng.toFixed(6) + "<br>" +
+                                         "UTM: " + utmCoords.easting.toFixed(2) + " E, " + utmCoords.northing.toFixed(2) + " N (Huso " + utmCoords.zone + utmCoords.hemisphere + ")";
             coordinatesDisplay.style.display = 'block';
 
             map.panTo(latlng);
@@ -346,14 +346,14 @@
             const C = e2 * Math.cos(latRad) * Math.cos(latRad) / (1 - e2);
             const A = Math.cos(latRad) * (lonRad - lonOrigin);
             const M = a * ((1 - e2 / 4 - 3 * e4 / 64 - 5 * e6 / 256) * latRad -
-                           (3 * e2 / 8 + 3 * e4 / 32 + 45 * e6 / 1024) * Math.sin(2 * latRad) +
-                           (15 * e4 / 256 + 45 * e6 / 1024) * Math.sin(4 * latRad) -
-                           (35 * e6 / 3072) * Math.sin(6 * latRad));
+                               (3 * e2 / 8 + 3 * e4 / 32 + 45 * e6 / 1024) * Math.sin(2 * latRad) +
+                               (15 * e4 / 256 + 45 * e6 / 1024) * Math.sin(4 * latRad) -
+                               (35 * e6 / 3072) * Math.sin(6 * latRad));
             const utmEasting = k0 * N * (A + (1 - T + C) * Math.pow(A, 3) / 6 +
-                                        (5 - 18 * T + T * T + 72 * C - 58 * e2) * Math.pow(A, 5) / 120) + falseEasting;
+                                         (5 - 18 * T + T * T + 72 * C - 58 * e2) * Math.pow(A, 5) / 120) + falseEasting;
             const utmNorthing = k0 * (M + N * Math.tan(latRad) * (A * A / 2 +
-                                        (5 - T + 9 * C + 4 * C * C) * Math.pow(A, 4) / 24 +
-                                        (61 - 58 * T + T * T + 600 * C - 330 * e2) * Math.pow(A, 6) / 720)) + falseNorthing;
+                                         (5 - T + 9 * C + 4 * C * C) * Math.pow(A, 4) / 24 +
+                                         (61 - 58 * T + T * T + 600 * C - 330 * e2) * Math.pow(A, 6) / 720)) + falseNorthing;
             return {
                 easting: utmEasting,
                 northing: utmNorthing,
@@ -369,7 +369,7 @@
             var latlng = e.latlng;
             var utmCoords = convertLatLngToUtm(latlng.lat, latlng.lng);
             coordinatesDisplay.innerHTML = "Lat: " + latlng.lat.toFixed(6) + ", Lon: " + latlng.lng.toFixed(6) + "<br>" +
-                                          "UTM: " + utmCoords.easting.toFixed(2) + " E, " + utmCoords.northing.toFixed(2) + " N (Huso " + utmCoords.zone + utmCoords.hemisphere + ")";
+                                         "UTM: " + utmCoords.easting.toFixed(2) + " E, " + utmCoords.northing.toFixed(2) + " N (Huso " + utmCoords.zone + utmCoords.hemisphere + ")";
             coordinatesDisplay.style.display = 'block';
         });
         // --- FIN DE VISUALIZADOR DE COORDENADAS ---
