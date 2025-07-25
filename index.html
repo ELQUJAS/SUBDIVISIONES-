@@ -5,7 +5,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
         <meta name="mobile-web-app-capable" content="yes">
-        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-app-capable" content="yes">
         <link rel="stylesheet" href="css/leaflet.css">
         <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
         <link rel="stylesheet" href="css/qgis2web.css">
@@ -23,7 +23,7 @@
         #coordinates-display {
             position: absolute;
             bottom: 10px; /* Distancia desde el borde inferior */
-            right: 10px; /* CAMBIO: Ahora a la derecha */
+            right: 10px; /* **CAMBIO**: Ahora a la derecha para evitar conflicto */
             background-color: rgba(255, 255, 255, 0.8);
             padding: 5px 10px;
             border-radius: 5px;
@@ -47,8 +47,8 @@
         /* Estilos para el nuevo buscador de coordenadas Lat/Lon */
         .coordinate-search-container {
             position: absolute;
-            top: 200px; /* CAMBIO: Posición inicial. Se ajustará dinámicamente en JS */
-            left: 10px; /* CAMBIO: Alinear con el control de leyenda */
+            /* La propiedad 'top' se establecerá dinámicamente con JavaScript */
+            left: 10px; /* Alinea con el borde izquierdo del control de leyenda */
             z-index: 1000;
             background-color: rgba(255, 255, 255, 0.9);
             padding: 8px;
@@ -56,10 +56,9 @@
             box-shadow: 0 1px 5px rgba(0,0,0,0.4);
             display: flex; /* Para alinear el input y el botón */
             gap: 5px; /* Espacio entre el input y el botón */
-            /* Añadir ancho fijo para que no se mueva con el texto */
-            width: fit-content; /* O un valor fijo como 350px */
-            max-width: calc(100% - 20px); /* Para asegurar que no exceda el ancho de la pantalla */
-            flex-wrap: wrap; /* Para que los elementos se envuelvan en pantallas pequeñas */
+            width: fit-content; /* Se ajusta al contenido */
+            max-width: calc(100% - 20px); /* Para pantallas pequeñas */
+            flex-wrap: wrap; /* Permite que los elementos se envuelvan si no hay espacio */
         }
 
         .coordinate-search-container input {
@@ -255,16 +254,7 @@
 
         // --- Ajustar la posición del buscador de coordenadas DESPUÉS de que la leyenda se cargue ---
         // Esto es crucial porque la posición "top" debe calcularse en función de la altura de la leyenda
-        map.on('overlayadd', function() {
-            positionCoordSearchBox();
-        });
-        map.on('overlayremove', function() {
-            positionCoordSearchBox();
-        });
-        // También llamar al inicio para posicionarlo correctamente si la leyenda ya está abierta
-        positionCoordSearchBox();
-
-        // Función para posicionar el buscador de coordenadas
+        // Se llama cada vez que el mapa es redimensionado o las capas se activan/desactivan para asegurar la posición correcta.
         function positionCoordSearchBox() {
             var legendControl = document.querySelector('.leaflet-control-layers-tree');
             var coordSearchContainer = document.querySelector('.coordinate-search-container');
@@ -274,6 +264,14 @@
                 coordSearchContainer.style.top = (legendBottom + 10) + 'px';
             }
         }
+
+        // Llamar a la función inicialmente y cada vez que la capa se modifica o el mapa se redimensiona
+        map.on('resize', positionCoordSearchBox);
+        map.on('overlayadd', positionCoordSearchBox);
+        map.on('overlayremove', positionCoordSearchBox);
+        // Llamar al inicio para posicionarlo correctamente si la leyenda ya está abierta
+        positionCoordSearchBox();
+
         // --- FIN Ajuste de posición ---
 
 
