@@ -1,5 +1,4 @@
 <!doctype html>
-<!doctype html>
 <html lang="en">
     <head>
         <meta charset="utf-8">
@@ -24,7 +23,7 @@
         #coordinates-display {
             position: absolute;
             bottom: 10px; /* Distancia desde el borde inferior */
-            right: 10px; /* **Ubicación**: En la esquina inferior derecha */
+            left: 10px; /* **CAMBIO**: Ahora en la esquina inferior izquierda */
             background-color: rgba(255, 255, 255, 0.8);
             padding: 5px 10px;
             border-radius: 5px;
@@ -263,7 +262,7 @@
                 var legendBottom = legendControl.offsetTop + legendControl.offsetHeight;
                 coordSearchContainer.style.top = (legendBottom + 10) + 'px'; // 10px de margen
                 coordSearchContainer.style.display = 'flex'; // Asegurarse de que sea visible
-                console.log('Buscador de coordenadas posicionado correctamente.');
+                console.log('Buscador de coordenadas posicionado correctamente bajo la leyenda.');
             } else {
                 // Si no se encuentran los elementos, esperamos y reintentamos.
                 console.log('Leyenda no encontrada o no renderizada, reintentando posicionar buscador en 100ms...');
