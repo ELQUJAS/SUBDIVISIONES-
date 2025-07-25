@@ -5,7 +5,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
         <meta name="mobile-web-app-capable" content="yes">
-        <meta name="apple-mobile-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
         <link rel="stylesheet" href="css/leaflet.css">
         <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
         <link rel="stylesheet" href="css/qgis2web.css">
@@ -22,43 +22,43 @@
         /* Estilo para la visualización de coordenadas del mouse */
         #coordinates-display {
             position: absolute;
-            bottom: 10px; /* Distancia desde el borde inferior */
-            right: 10px; /* **CAMBIO**: Ahora a la derecha para evitar conflicto */
+            bottom: 10px;
+            right: 10px; /* Se mantiene a la derecha */
             background-color: rgba(255, 255, 255, 0.8);
             padding: 5px 10px;
             border-radius: 5px;
             font-family: sans-serif;
             font-size: 14px;
             z-index: 1000;
-            display: block; /* Siempre visible para coordenadas del mouse */
-            white-space: pre-wrap; /* Permite saltos de línea para mostrar Lat/Lon y UTM */
+            display: block;
+            white-space: pre-wrap;
         }
 
         /* --- Estilo para el ícono de búsqueda celeste --- */
         .celeste-marker-icon {
-            font-size: 32px; /* Tamaño del ícono, puedes ajustarlo */
-            color: #00BFFF; /* Color celeste (Deep Sky Blue), puedes usar otros tonos como #87CEEB para Sky Blue */
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5); /* Sombra para que destaque un poco */
+            font-size: 32px;
+            color: #00BFFF;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
             text-align: center;
-            line-height: 32px; /* Debe coincidir con el iconSize[1] del L.divIcon */
+            line-height: 32px;
         }
         /* --- Fin del estilo del marcador celeste --- */
 
         /* Estilos para el nuevo buscador de coordenadas Lat/Lon */
         .coordinate-search-container {
             position: absolute;
-            /* La propiedad 'top' se establecerá dinámicamente con JavaScript */
-            left: 10px; /* Alinea con el borde izquierdo del control de leyenda */
+            /* 'top' se establecerá dinámicamente con JavaScript */
+            left: 10px; /* Alineado con el control de leyenda */
             z-index: 1000;
             background-color: rgba(255, 255, 255, 0.9);
             padding: 8px;
             border-radius: 5px;
             box-shadow: 0 1px 5px rgba(0,0,0,0.4);
-            display: flex; /* Para alinear el input y el botón */
-            gap: 5px; /* Espacio entre el input y el botón */
-            width: fit-content; /* Se ajusta al contenido */
-            max-width: calc(100% - 20px); /* Para pantallas pequeñas */
-            flex-wrap: wrap; /* Permite que los elementos se envuelvan si no hay espacio */
+            display: flex;
+            gap: 5px;
+            width: fit-content;
+            max-width: calc(100% - 20px);
+            flex-wrap: wrap;
         }
 
         .coordinate-search-container input {
@@ -66,24 +66,24 @@
             padding: 5px;
             border-radius: 3px;
             font-size: 14px;
-            width: 220px; /* Ancho ajustable */
+            width: 220px;
         }
 
         .coordinate-search-container button {
-            background-color: #007bff; /* Un azul agradable */
+            background-color: #007bff;
             color: white;
             border: none;
             padding: 5px 10px;
             border-radius: 3px;
             cursor: pointer;
             font-size: 14px;
-            display: flex; /* Para alinear el icono con el texto */
+            display: flex;
             align-items: center;
-            gap: 5px; /* Espacio entre icono y texto */
+            gap: 5px;
         }
 
         .coordinate-search-container button:hover {
-            background-color: #0056b3; /* Un azul más oscuro al pasar el mouse */
+            background-color: #0056b3;
         }
         </style>
         <title></title>
@@ -253,25 +253,31 @@
         setBounds();
 
         // --- Ajustar la posición del buscador de coordenadas DESPUÉS de que la leyenda se cargue ---
-        // Esto es crucial porque la posición "top" debe calcularse en función de la altura de la leyenda
-        // Se llama cada vez que el mapa es redimensionado o las capas se activan/desactivan para asegurar la posición correcta.
         function positionCoordSearchBox() {
             var legendControl = document.querySelector('.leaflet-control-layers-tree');
             var coordSearchContainer = document.querySelector('.coordinate-search-container');
+
             if (legendControl && coordSearchContainer) {
+                // La leyenda está visible y cargada
                 var legendBottom = legendControl.offsetTop + legendControl.offsetHeight;
-                // Dejar un pequeño margen debajo de la leyenda
-                coordSearchContainer.style.top = (legendBottom + 10) + 'px';
+                coordSearchContainer.style.top = (legendBottom + 10) + 'px'; // 10px de margen
+                coordSearchContainer.style.display = 'flex'; // Asegurarse de que sea visible
+                console.log('Buscador de coordenadas posicionado correctamente.');
+            } else {
+                // La leyenda aún no está disponible, intentar de nuevo
+                console.log('Leyenda no encontrada o no renderizada, reintentando posicionar buscador en 100ms...');
+                setTimeout(positionCoordSearchBox, 100);
             }
         }
 
-        // Llamar a la función inicialmente y cada vez que la capa se modifica o el mapa se redimensiona
+        // Llamar a la función inicialmente. Usamos un pequeño retraso inicial para dar tiempo al DOM a renderizarse.
+        // También la llamamos en eventos importantes que puedan afectar la posición de la leyenda.
         map.on('resize', positionCoordSearchBox);
         map.on('overlayadd', positionCoordSearchBox);
         map.on('overlayremove', positionCoordSearchBox);
-        // Llamar al inicio para posicionarlo correctamente si la leyenda ya está abierta
-        positionCoordSearchBox();
 
+        // Intento inicial con un pequeño retraso
+        setTimeout(positionCoordSearchBox, 500); // 500ms de retraso inicial
         // --- FIN Ajuste de posición ---
 
 
@@ -364,13 +370,13 @@
         map.addControl(searchControl);
 
         // Añade el icono de Font Awesome al botón de búsqueda de ROL
-        if (typeof url === 'undefined') { // Esto es una condición que a veces usa qgis2web, la mantenemos.
+        if (typeof url === 'undefined') {
             var searchButton = document.querySelector('.search-button');
             if (searchButton) {
                 searchButton.className += ' fa fa-binoculars';
             }
         } else {
-            var searchButton = document.querySelectorAll('.search-button')[1]; // Puede haber múltiples con la misma clase
+            var searchButton = document.querySelectorAll('.search-button')[1];
             if (searchButton) {
                 searchButton.className += ' fa fa-binoculars';
             }
@@ -381,10 +387,9 @@
 
         if (searchInput) {
             searchInput.addEventListener('input', function() {
-                if (this.value === '') { // Si el campo de entrada está completamente vacío
+                if (this.value === '') {
                     console.log('Input de búsqueda de ROL vacío detectado. Forzando reseteo de búsqueda y eliminación de marcador.');
-
-                    if (searchMarker) { // Si hay un marcador activo (celeste), lo elimina
+                    if (searchMarker) {
                         map.removeLayer(searchMarker);
                         searchMarker = null;
                         console.log('Marcador (ROL) eliminado por detección de input vacío.');
@@ -400,8 +405,8 @@
         var coordSearchMarker = null; // Marcador específico para la búsqueda de coordenadas Lat/Lon
 
         document.getElementById('searchCoordButton').addEventListener('click', function() {
-            var input = document.getElementById('coordInput').value.trim(); // .trim() para quitar espacios al inicio/final
-            var parts = input.split(/[ ,]+/); // Divide por espacio o coma
+            var input = document.getElementById('coordInput').value.trim();
+            var parts = input.split(/[ ,]+/);
 
             if (parts.length === 2) {
                 var lat = parseFloat(parts[0]);
@@ -418,7 +423,7 @@
                     // También elimina el marcador de búsqueda por ROL si está activo
                     if (searchMarker) {
                         map.removeLayer(searchMarker);
-                        searchMarker = null; // Resetea la variable del marcador de ROL
+                        searchMarker = null;
                         console.log('Marcador (ROL) eliminado al buscar por coordenada.');
                     }
 
@@ -426,8 +431,8 @@
 
                     // Crea un ícono personalizado para el marcador de coordenadas (el mismo celeste)
                     var customCoordIcon = L.divIcon({
-                        className: 'celeste-marker-icon', // Reutiliza la clase CSS existente
-                        html: '<i class="fa fa-crosshairs"></i>', // Ícono de mira o puntero para coordenadas
+                        className: 'celeste-marker-icon',
+                        html: '<i class="fa fa-crosshairs"></i>',
                         iconSize: [32, 32],
                         iconAnchor: [16, 32],
                         popupAnchor: [0, -32]
@@ -447,7 +452,7 @@
                         }
                     });
 
-                    map.setView(foundLatLng, 18); // Centra el mapa en la coordenada con zoom 18
+                    map.setView(foundLatLng, 18);
 
                     // Actualiza el display de coordenadas
                     coordinatesDisplay.innerHTML = "Lat: " + lat.toFixed(6) + ", Lon: " + lon.toFixed(6) + "<br>" +
