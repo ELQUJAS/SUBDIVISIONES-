@@ -1,4 +1,5 @@
 <!doctype html>
+<!doctype html>
 <html lang="en">
     <head>
         <meta charset="utf-8">
@@ -22,25 +23,25 @@
         /* Estilo para la visualización de coordenadas del mouse */
         #coordinates-display {
             position: absolute;
-            bottom: 10px;
-            right: 10px; /* Se mantiene a la derecha */
+            bottom: 10px; /* Distancia desde el borde inferior */
+            right: 10px; /* **Ubicación**: En la esquina inferior derecha */
             background-color: rgba(255, 255, 255, 0.8);
             padding: 5px 10px;
             border-radius: 5px;
             font-family: sans-serif;
             font-size: 14px;
             z-index: 1000;
-            display: block;
-            white-space: pre-wrap;
+            display: block; /* Siempre visible para coordenadas del mouse */
+            white-space: pre-wrap; /* Permite saltos de línea para mostrar Lat/Lon y UTM */
         }
 
         /* --- Estilo para el ícono de búsqueda celeste --- */
         .celeste-marker-icon {
-            font-size: 32px;
-            color: #00BFFF;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            font-size: 32px; /* Tamaño del ícono, puedes ajustarlo */
+            color: #00BFFF; /* Color celeste (Deep Sky Blue), puedes usar otros tonos como #87CEEB para Sky Blue */
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5); /* Sombra para que destaque un poco */
             text-align: center;
-            line-height: 32px;
+            line-height: 32px; /* Debe coincidir con el iconSize[1] del L.divIcon */
         }
         /* --- Fin del estilo del marcador celeste --- */
 
@@ -48,17 +49,17 @@
         .coordinate-search-container {
             position: absolute;
             /* 'top' se establecerá dinámicamente con JavaScript */
-            left: 10px; /* Alineado con el control de leyenda */
+            left: 10px; /* Alineado con el borde izquierdo del control de leyenda */
             z-index: 1000;
             background-color: rgba(255, 255, 255, 0.9);
             padding: 8px;
             border-radius: 5px;
             box-shadow: 0 1px 5px rgba(0,0,0,0.4);
-            display: flex;
-            gap: 5px;
-            width: fit-content;
-            max-width: calc(100% - 20px);
-            flex-wrap: wrap;
+            display: flex; /* Para alinear el input y el botón */
+            gap: 5px; /* Espacio entre el input y el botón */
+            width: fit-content; /* Se ajusta al contenido */
+            max-width: calc(100% - 20px); /* Para pantallas pequeñas */
+            flex-wrap: wrap; /* Permite que los elementos se envuelvan si no hay espacio */
         }
 
         .coordinate-search-container input {
@@ -66,24 +67,24 @@
             padding: 5px;
             border-radius: 3px;
             font-size: 14px;
-            width: 220px;
+            width: 220px; /* Ancho ajustable */
         }
 
         .coordinate-search-container button {
-            background-color: #007bff;
+            background-color: #007bff; /* Un azul agradable */
             color: white;
             border: none;
             padding: 5px 10px;
             border-radius: 3px;
             cursor: pointer;
             font-size: 14px;
-            display: flex;
+            display: flex; /* Para alinear el icono con el texto */
             align-items: center;
-            gap: 5px;
+            gap: 5px; /* Espacio entre icono y texto */
         }
 
         .coordinate-search-container button:hover {
-            background-color: #0056b3;
+            background-color: #0056b3; /* Un azul más oscuro al pasar el mouse */
         }
         </style>
         <title></title>
@@ -258,13 +259,13 @@
             var coordSearchContainer = document.querySelector('.coordinate-search-container');
 
             if (legendControl && coordSearchContainer) {
-                // La leyenda está visible y cargada
+                // Si la leyenda y el contenedor existen, calculamos y aplicamos la posición
                 var legendBottom = legendControl.offsetTop + legendControl.offsetHeight;
                 coordSearchContainer.style.top = (legendBottom + 10) + 'px'; // 10px de margen
                 coordSearchContainer.style.display = 'flex'; // Asegurarse de que sea visible
                 console.log('Buscador de coordenadas posicionado correctamente.');
             } else {
-                // La leyenda aún no está disponible, intentar de nuevo
+                // Si no se encuentran los elementos, esperamos y reintentamos.
                 console.log('Leyenda no encontrada o no renderizada, reintentando posicionar buscador en 100ms...');
                 setTimeout(positionCoordSearchBox, 100);
             }
@@ -276,7 +277,7 @@
         map.on('overlayadd', positionCoordSearchBox);
         map.on('overlayremove', positionCoordSearchBox);
 
-        // Intento inicial con un pequeño retraso
+        // Intento inicial con un pequeño retraso para asegurar que la leyenda esté renderizada
         setTimeout(positionCoordSearchBox, 500); // 500ms de retraso inicial
         // --- FIN Ajuste de posición ---
 
