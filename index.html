@@ -23,7 +23,7 @@
         #coordinates-display {
             position: absolute;
             bottom: 10px; /* Distancia desde el borde inferior */
-            left: 10px; /* Distancia desde el borde izquierdo */
+            right: 10px; /* CAMBIO: Ahora a la derecha */
             background-color: rgba(255, 255, 255, 0.8);
             padding: 5px 10px;
             border-radius: 5px;
@@ -47,8 +47,8 @@
         /* Estilos para el nuevo buscador de coordenadas Lat/Lon */
         .coordinate-search-container {
             position: absolute;
-            top: 10px; /* Ajusta según sea necesario para no chocar con otros controles */
-            right: 10px; /* Posicionamiento a la derecha */
+            top: 200px; /* CAMBIO: Posición inicial. Se ajustará dinámicamente en JS */
+            left: 10px; /* CAMBIO: Alinear con el control de leyenda */
             z-index: 1000;
             background-color: rgba(255, 255, 255, 0.9);
             padding: 8px;
@@ -56,6 +56,10 @@
             box-shadow: 0 1px 5px rgba(0,0,0,0.4);
             display: flex; /* Para alinear el input y el botón */
             gap: 5px; /* Espacio entre el input y el botón */
+            /* Añadir ancho fijo para que no se mueva con el texto */
+            width: fit-content; /* O un valor fijo como 350px */
+            max-width: calc(100% - 20px); /* Para asegurar que no exceda el ancho de la pantalla */
+            flex-wrap: wrap; /* Para que los elementos se envuelvan en pantallas pequeñas */
         }
 
         .coordinate-search-container input {
@@ -249,6 +253,30 @@
         lay.addTo(map);
         setBounds();
 
+        // --- Ajustar la posición del buscador de coordenadas DESPUÉS de que la leyenda se cargue ---
+        // Esto es crucial porque la posición "top" debe calcularse en función de la altura de la leyenda
+        map.on('overlayadd', function() {
+            positionCoordSearchBox();
+        });
+        map.on('overlayremove', function() {
+            positionCoordSearchBox();
+        });
+        // También llamar al inicio para posicionarlo correctamente si la leyenda ya está abierta
+        positionCoordSearchBox();
+
+        // Función para posicionar el buscador de coordenadas
+        function positionCoordSearchBox() {
+            var legendControl = document.querySelector('.leaflet-control-layers-tree');
+            var coordSearchContainer = document.querySelector('.coordinate-search-container');
+            if (legendControl && coordSearchContainer) {
+                var legendBottom = legendControl.offsetTop + legendControl.offsetHeight;
+                // Dejar un pequeño margen debajo de la leyenda
+                coordSearchContainer.style.top = (legendBottom + 10) + 'px';
+            }
+        }
+        // --- FIN Ajuste de posición ---
+
+
         // --- Funcionalidad de Búsqueda de ROL ---
         var searchMarker = null; // Para almacenar el marcador personalizado (celeste) de búsqueda por ROL
         var coordinatesDisplay = document.getElementById('coordinates-display'); // Elemento para mostrar coordenadas
@@ -275,6 +303,7 @@
             if (coordSearchMarker) {
                 map.removeLayer(coordSearchMarker);
                 coordSearchMarker = null; // Resetea la variable del marcador de coordenadas
+                console.log('Marcador (Coordenada) eliminado al buscar por ROL.');
             }
 
             var latlng = e.latlng;
@@ -362,10 +391,6 @@
                         searchMarker = null;
                         console.log('Marcador (ROL) eliminado por detección de input vacío.');
                     }
-
-                    // No ocultamos coordinatesDisplay aquí, ya que el mousemove lo mantendrá actualizado.
-                    // coordinatesDisplay.style.display = 'block';
-                    // searchControl.collapse(); // Ya está manejado por 'search:collapsed' en algunos casos
                     console.log('Control de búsqueda de ROL colapsado para resetear la búsqueda.');
                 }
             });
