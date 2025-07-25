@@ -1,4 +1,4 @@
-<!<!doctype html>
+<!doctype html>
 <html lang="en">
     <head>
         <meta charset="utf-8">
@@ -19,7 +19,7 @@
             padding: 0;
             margin: 0;
         }
-        /* Estilo para la visualización de coordenadas */
+        /* Estilo para la visualización de coordenadas del mouse */
         #coordinates-display {
             position: absolute;
             bottom: 10px; /* Distancia desde el borde inferior */
@@ -42,7 +42,46 @@
             text-align: center;
             line-height: 32px; /* Debe coincidir con el iconSize[1] del L.divIcon */
         }
-        /* --- Fin del estilo --- */
+        /* --- Fin del estilo del marcador celeste --- */
+
+        /* Estilos para el nuevo buscador de coordenadas Lat/Lon */
+        .coordinate-search-container {
+            position: absolute;
+            top: 10px; /* Ajusta según sea necesario para no chocar con otros controles */
+            right: 10px; /* Posicionamiento a la derecha */
+            z-index: 1000;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 8px;
+            border-radius: 5px;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.4);
+            display: flex; /* Para alinear el input y el botón */
+            gap: 5px; /* Espacio entre el input y el botón */
+        }
+
+        .coordinate-search-container input {
+            border: 1px solid #ccc;
+            padding: 5px;
+            border-radius: 3px;
+            font-size: 14px;
+            width: 220px; /* Ancho ajustable */
+        }
+
+        .coordinate-search-container button {
+            background-color: #007bff; /* Un azul agradable */
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex; /* Para alinear el icono con el texto */
+            align-items: center;
+            gap: 5px; /* Espacio entre icono y texto */
+        }
+
+        .coordinate-search-container button:hover {
+            background-color: #0056b3; /* Un azul más oscuro al pasar el mouse */
+        }
         </style>
         <title></title>
     </head>
@@ -50,6 +89,10 @@
         <div id="map">
         </div>
         <div id="coordinates-display"></div>
+        <div class="coordinate-search-container">
+            <input type="text" id="coordInput" placeholder="Ej: -39.280694 -72.333695">
+            <button id="searchCoordButton"><i class="fa fa-crosshairs"></i> Buscar Coordenada</button>
+        </div>
 
         <script src="js/qgis2web_expressions.js"></script>
         <script src="js/leaflet.js"></script>
@@ -130,34 +173,34 @@
         map.addLayer(layer_GoogleSatellite_1);
         function pop_Subdivisiones20232024_2(feature, layer) {
             var popupContent = '<table>\
-                    <tr>\
-                        <th scope="row">ROL:</th>\
-                        <td>' + (feature.properties['rol'] !== null ? autolinker.link(String(feature.properties['rol']).trim().replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
-                    </tr>\
-                    <tr>\
-                        <th scope="row">ZONA PRI:</th>\
-                        <td>' + (feature.properties['ZONA PRI'] !== null ? autolinker.link(String(feature.properties['ZONA PRI']).trim().replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
-                    </tr>\
-                    <tr>\
-                        <th scope="row">ZONA COMUNAL:</th>\
-                        <td>' + (feature.properties['ZONA '] !== null ? autolinker.link(String(feature.properties['ZONA ']).trim().replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
-                    </tr>\
-                    <tr>\
-                        <th scope="row">ZOIT:</th>\
-                        <td>' + (feature.properties['ZOIT'] !== null ? autolinker.link(String(feature.properties['ZOIT']).trim().replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
-                    </tr>\
-                    <tr>\
-                        <th scope="row">ESTADO LAGO:</th>\
-                        <td>' + (feature.properties['ESTADO LAG'] !== null ? autolinker.link(String(feature.properties['ESTADO LAG']).trim().replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
-                    </tr>\
-                    <tr>\
-                        <th scope="row">COMUNIDAD INDÍGENA:</th>\
-                        <td>' + (feature.properties['COMUNIDAD '] !== null ? autolinker.link(String(feature.properties['COMUNIDAD ']).trim().replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
-                    </tr>\
-                    <tr>\
-                        <th scope="row">CANTIDAD DE CONSTRUCCIONES:</th>\
-                        <td>' + (feature.properties['CONSTRUC.'] !== null ? autolinker.link(String(feature.properties['CONSTRUC.']).trim().replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
-                    </tr>\
+                        <tr>\
+                            <th scope="row">ROL:</th>\
+                            <td>' + (feature.properties['rol'] !== null ? autolinker.link(String(feature.properties['rol']).trim().replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                        </tr>\
+                        <tr>\
+                            <th scope="row">ZONA PRI:</th>\
+                            <td>' + (feature.properties['ZONA PRI'] !== null ? autolinker.link(String(feature.properties['ZONA PRI']).trim().replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                        </tr>\
+                        <tr>\
+                            <th scope="row">ZONA COMUNAL:</th>\
+                            <td>' + (feature.properties['ZONA '] !== null ? autolinker.link(String(feature.properties['ZONA ']).trim().replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                        </tr>\
+                        <tr>\
+                            <th scope="row">ZOIT:</th>\
+                            <td>' + (feature.properties['ZOIT'] !== null ? autolinker.link(String(feature.properties['ZOIT']).trim().replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                        </tr>\
+                        <tr>\
+                            <th scope="row">ESTADO LAGO:</th>\
+                            <td>' + (feature.properties['ESTADO LAG'] !== null ? autolinker.link(String(feature.properties['ESTADO LAG']).trim().replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                        </tr>\
+                        <tr>\
+                            <th scope="row">COMUNIDAD INDÍGENA:</th>\
+                            <td>' + (feature.properties['COMUNIDAD '] !== null ? autolinker.link(String(feature.properties['COMUNIDAD ']).trim().replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                        </tr>\
+                        <tr>\
+                            <th scope="row">CANTIDAD DE CONSTRUCCIONES:</th>\
+                            <td>' + (feature.properties['CONSTRUC.'] !== null ? autolinker.link(String(feature.properties['CONSTRUC.']).trim().replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                        </tr>\
                 </table>';
             var content = removeEmptyRowsFromPopupContent(popupContent, feature);
 			layer.on('popupopen', function(e) {
@@ -206,8 +249,8 @@
         lay.addTo(map);
         setBounds();
 
-        // --- Funcionalidad de Búsqueda Personalizada ---
-        var searchMarker = null; // Para almacenar el marcador personalizado (celeste)
+        // --- Funcionalidad de Búsqueda de ROL ---
+        var searchMarker = null; // Para almacenar el marcador personalizado (celeste) de búsqueda por ROL
         var coordinatesDisplay = document.getElementById('coordinates-display'); // Elemento para mostrar coordenadas
 
         var searchControl = new L.Control.Search({
@@ -219,26 +262,31 @@
             marker: false // Deshabilita el marcador por defecto de leaflet-search
         });
 
-        // Evento cuando se encuentra una ubicación al buscar
+        // Evento cuando se encuentra una ubicación al buscar por ROL
         searchControl.on('search:locationfound', function(e) {
             console.log('Evento: search:locationfound - ROL encontrado:', e.text);
 
-            // Elimina el marcador anterior si existe antes de añadir uno nuevo
+            // Elimina el marcador anterior de búsqueda por ROL si existe
             if (searchMarker) {
                 map.removeLayer(searchMarker);
-                console.log('Marcador anterior eliminado.');
+                console.log('Marcador anterior (ROL) eliminado.');
+            }
+            // También elimina el marcador de búsqueda por coordenadas si está activo
+            if (coordSearchMarker) {
+                map.removeLayer(coordSearchMarker);
+                coordSearchMarker = null; // Resetea la variable del marcador de coordenadas
             }
 
             var latlng = e.latlng;
             var utmCoords = convertLatLngToUtm(latlng.lat, latlng.lng);
 
-            // --- SECCIÓN: Crea y añade el marcador celeste para la búsqueda ---
+            // --- SECCIÓN: Crea y añade el marcador celeste para la búsqueda de ROL ---
             var customIcon = L.divIcon({
                 className: 'celeste-marker-icon', // Aplica la clase CSS para el color y tamaño
                 html: '<i class="fa fa-map-marker"></i>', // Ícono de Font Awesome (un pin de mapa)
-                iconSize: [32, 32],                       // Tamaño del contenedor del ícono
-                iconAnchor: [16, 32],                     // Ancla del ícono (centro inferior para un pin)
-                popupAnchor: [0, -32]                     // Posición del popup en relación con el ancla
+                iconSize: [32, 32],
+                iconAnchor: [16, 32],
+                popupAnchor: [0, -32]
             });
 
             searchMarker = L.marker(latlng, {icon: customIcon})
@@ -248,80 +296,159 @@
 
             // --- Evento para eliminar el marcador cuando su popup se cierra ---
             searchMarker.on('popupclose', function() {
-                console.log('Popup del marcador cerrado. Eliminando marcador.');
+                console.log('Popup del marcador ROL cerrado. Eliminando marcador.');
                 if (searchMarker) {
                     map.removeLayer(searchMarker);
                     searchMarker = null;
                 }
             });
-            // --- Fin del Evento para eliminar el marcador ---
+            // --- Fin del Evento para eliminar el marcador de ROL ---
 
 
-            // Actualiza y muestra la visualización de coordenadas con las del resultado de la búsqueda
+            // Actualiza y muestra la visualización de coordenadas con las del resultado de la búsqueda por ROL
             coordinatesDisplay.innerHTML = "ROL: " + e.text + "<br>" +
-                                         "Lat: " + latlng.lat.toFixed(6) + ", Lon: " + latlng.lng.toFixed(6) + "<br>" +
-                                         "UTM: " + utmCoords.easting.toFixed(2) + " E, " + utmCoords.northing.toFixed(2) + " N (Huso " + utmCoords.zone + utmCoords.hemisphere + ")";
+                                          "Lat: " + latlng.lat.toFixed(6) + ", Lon: " + latlng.lng.toFixed(6) + "<br>" +
+                                          "UTM: " + utmCoords.easting.toFixed(2) + " E, " + utmCoords.northing.toFixed(2) + " N (Huso " + utmCoords.zone + utmCoords.hemisphere + ")";
             coordinatesDisplay.style.display = 'block';
 
             map.panTo(latlng);
         });
 
-        // Evento cuando la barra de búsqueda se colapsa o se limpia
+        // Evento cuando la barra de búsqueda de ROL se colapsa o se limpia
         searchControl.on('search:collapsed', function(e) {
-            console.log('Evento: search:collapsed - El buscador se ha colapsado o limpiado.');
+            console.log('Evento: search:collapsed - El buscador de ROL se ha colapsado o limpiado.');
             if (searchMarker) { // Si hay un marcador activo (el celeste), lo elimina
                 map.removeLayer(searchMarker);
                 searchMarker = null;
-                console.log('Marcador de búsqueda eliminado por colapso.');
+                console.log('Marcador de búsqueda (ROL) eliminado por colapso.');
             }
         });
 
-        // Evento cuando la búsqueda es cancelada explícitamente (ej. clic en la 'x')
+        // Evento cuando la búsqueda de ROL es cancelada explícitamente (ej. clic en la 'x')
         searchControl.on('search:cancel', function(e) {
-            console.log('Evento: search:cancel - La búsqueda ha sido cancelada.');
+            console.log('Evento: search:cancel - La búsqueda de ROL ha sido cancelada.');
             if (searchMarker) { // Si hay un marcador activo (celeste), lo elimina
                 map.removeLayer(searchMarker);
                 searchMarker = null;
-                console.log('Marcador de búsqueda eliminado por cancelación.');
+                console.log('Marcador de búsqueda (ROL) eliminado por cancelación.');
             }
         });
 
         map.addControl(searchControl);
 
-        // Añade el icono de Font Awesome al botón de búsqueda
-        if (typeof url === 'undefined') {
+        // Añade el icono de Font Awesome al botón de búsqueda de ROL
+        if (typeof url === 'undefined') { // Esto es una condición que a veces usa qgis2web, la mantenemos.
             var searchButton = document.querySelector('.search-button');
             if (searchButton) {
                 searchButton.className += ' fa fa-binoculars';
             }
         } else {
-            var searchButton = document.querySelectorAll('.search-button')[1];
+            var searchButton = document.querySelectorAll('.search-button')[1]; // Puede haber múltiples con la misma clase
             if (searchButton) {
                 searchButton.className += ' fa fa-binoculars';
             }
         }
 
-        // --- SOLUCIÓN ROBUSTA: Asegura que el marcador y la búsqueda se resetee al vaciar el input ---
-        var searchInput = document.querySelector('.leaflet-control-search .search-input'); 
+        // --- SOLUCIÓN ROBUSTA: Asegura que el marcador y la búsqueda por ROL se resetee al vaciar el input ---
+        var searchInput = document.querySelector('.leaflet-control-search .search-input');
 
         if (searchInput) {
             searchInput.addEventListener('input', function() {
                 if (this.value === '') { // Si el campo de entrada está completamente vacío
-                    console.log('Input de búsqueda vacío detectado. Forzando reseteo de búsqueda y eliminación de marcador.');
-                    
+                    console.log('Input de búsqueda de ROL vacío detectado. Forzando reseteo de búsqueda y eliminación de marcador.');
+
                     if (searchMarker) { // Si hay un marcador activo (celeste), lo elimina
                         map.removeLayer(searchMarker);
                         searchMarker = null;
-                        console.log('Marcador eliminado por detección de input vacío.');
+                        console.log('Marcador (ROL) eliminado por detección de input vacío.');
                     }
-                    
-                    coordinatesDisplay.style.display = 'block'; 
-                    searchControl.collapse(); 
-                    console.log('Control de búsqueda colapsado para resetear la búsqueda.');
+
+                    // No ocultamos coordinatesDisplay aquí, ya que el mousemove lo mantendrá actualizado.
+                    // coordinatesDisplay.style.display = 'block';
+                    // searchControl.collapse(); // Ya está manejado por 'search:collapsed' en algunos casos
+                    console.log('Control de búsqueda de ROL colapsado para resetear la búsqueda.');
                 }
             });
         }
-        // --- FIN DE SOLUCIÓN ROBUSTA ---
+        // --- FIN DE SOLUCIÓN ROBUSTA PARA BÚSQUEDA DE ROL ---
+
+
+        // --- NUEVA FUNCIONALIDAD: Buscador de Coordenadas Lat/Lon ---
+        var coordSearchMarker = null; // Marcador específico para la búsqueda de coordenadas Lat/Lon
+
+        document.getElementById('searchCoordButton').addEventListener('click', function() {
+            var input = document.getElementById('coordInput').value.trim(); // .trim() para quitar espacios al inicio/final
+            var parts = input.split(/[ ,]+/); // Divide por espacio o coma
+
+            if (parts.length === 2) {
+                var lat = parseFloat(parts[0]);
+                var lon = parseFloat(parts[1]);
+
+                if (!isNaN(lat) && !isNaN(lon) && lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) {
+                    var foundLatLng = L.latLng(lat, lon);
+
+                    // Elimina el marcador anterior de búsqueda de coordenadas si existe
+                    if (coordSearchMarker) {
+                        map.removeLayer(coordSearchMarker);
+                        console.log('Marcador anterior (Coordenada) eliminado.');
+                    }
+                    // También elimina el marcador de búsqueda por ROL si está activo
+                    if (searchMarker) {
+                        map.removeLayer(searchMarker);
+                        searchMarker = null; // Resetea la variable del marcador de ROL
+                        console.log('Marcador (ROL) eliminado al buscar por coordenada.');
+                    }
+
+                    var utmCoords = convertLatLngToUtm(lat, lon);
+
+                    // Crea un ícono personalizado para el marcador de coordenadas (el mismo celeste)
+                    var customCoordIcon = L.divIcon({
+                        className: 'celeste-marker-icon', // Reutiliza la clase CSS existente
+                        html: '<i class="fa fa-crosshairs"></i>', // Ícono de mira o puntero para coordenadas
+                        iconSize: [32, 32],
+                        iconAnchor: [16, 32],
+                        popupAnchor: [0, -32]
+                    });
+
+                    coordSearchMarker = L.marker(foundLatLng, {icon: customCoordIcon})
+                        .addTo(map)
+                        .bindPopup("<b>Coordenada Encontrada:</b><br>Lat: " + lat.toFixed(6) + "<br>Long: " + lon.toFixed(6) + "<br>UTM: " + utmCoords.easting.toFixed(2) + " E, " + utmCoords.northing.toFixed(2) + " N (Huso " + utmCoords.zone + utmCoords.hemisphere + ")")
+                        .openPopup();
+
+                    // Evento para eliminar el marcador cuando su popup se cierra
+                    coordSearchMarker.on('popupclose', function() {
+                        console.log('Popup del marcador de Coordenada cerrado. Eliminando marcador.');
+                        if (coordSearchMarker) {
+                            map.removeLayer(coordSearchMarker);
+                            coordSearchMarker = null;
+                        }
+                    });
+
+                    map.setView(foundLatLng, 18); // Centra el mapa en la coordenada con zoom 18
+
+                    // Actualiza el display de coordenadas
+                    coordinatesDisplay.innerHTML = "Lat: " + lat.toFixed(6) + ", Lon: " + lon.toFixed(6) + "<br>" +
+                                                  "UTM: " + utmCoords.easting.toFixed(2) + " E, " + utmCoords.northing.toFixed(2) + " N (Huso " + utmCoords.zone + utmCoords.hemisphere + ")";
+                    coordinatesDisplay.style.display = 'block';
+
+                } else {
+                    alert('Por favor, introduce coordenadas válidas (Latitud entre -90 y 90, Longitud entre -180 y 180).');
+                }
+            } else {
+                alert('Formato de coordenada incorrecto. Usa "latitud longitud" o "latitud, longitud". Ejemplo: -39.280694 -72.333695');
+            }
+        });
+
+        // Asegurarse de que el marcador de coordenadas se elimine si el input se vacía
+        document.getElementById('coordInput').addEventListener('input', function() {
+            if (this.value === '' && coordSearchMarker) {
+                map.removeLayer(coordSearchMarker);
+                coordSearchMarker = null;
+                console.log('Marcador de Coordenada eliminado por input vacío.');
+            }
+        });
+        // --- FIN NUEVA FUNCIONALIDAD: Buscador de Coordenadas Lat/Lon ---
+
 
         // --- FUNCIONES DE CONVERSIÓN LAT/LON A UTM (SIMPLIFICADA para Huso 18 Sur) ---
         function convertLatLngToUtm(lat, lon) {
@@ -334,7 +461,7 @@
             const e4 = e2 * e2;
             const e6 = e4 * e2;
             const degToRad = Math.PI / 180;
-            const zone = 18;
+            const zone = 18; // Huso UTM para esta región de Chile (e.g., Valdivia/Temuco)
             const southernHemisphere = lat < 0;
             const falseNorthing = southernHemisphere ? 10000000 : 0;
             const falseEasting = 500000;
@@ -369,7 +496,7 @@
             var latlng = e.latlng;
             var utmCoords = convertLatLngToUtm(latlng.lat, latlng.lng);
             coordinatesDisplay.innerHTML = "Lat: " + latlng.lat.toFixed(6) + ", Lon: " + latlng.lng.toFixed(6) + "<br>" +
-                                         "UTM: " + utmCoords.easting.toFixed(2) + " E, " + utmCoords.northing.toFixed(2) + " N (Huso " + utmCoords.zone + utmCoords.hemisphere + ")";
+                                          "UTM: " + utmCoords.easting.toFixed(2) + " E, " + utmCoords.northing.toFixed(2) + " N (Huso " + utmCoords.zone + utmCoords.hemisphere + ")";
             coordinatesDisplay.style.display = 'block';
         });
         // --- FIN DE VISUALIZADOR DE COORDENADAS ---
